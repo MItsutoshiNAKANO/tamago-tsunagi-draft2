@@ -30,7 +30,9 @@
 
 ;;; Code:
 
-(require 'its)
+(eval-when-compile
+  (require 'its)
+  (require 'cl))
 
 (eval-when (compile)
   (defconst its-compaction-enable t))

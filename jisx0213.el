@@ -30,5 +30,10 @@
 
 ;;; Code:
 
-(define-charset nil 'japanese-jisx0213
-  [2 94 2 0 ?O 0 "JIS X 0213" "JIS X 0213" "JIS X 0213"])
+(unless (charsetp 'japanese-jisx0213-1)
+  (define-charset 151 'japanese-jisx0213-1
+    [2 94 2 0 ?O 0 "JISX0213-1" "JISX0213-1" "JISX0213-1 (Japanese)"]))
+
+(unless (charsetp 'japanese-jisx0213-2)
+  (define-charset 254 'japanese-jisx0213-2
+    [2 94 2 0 ?P 0 "JISX0213-2" "JISX0213-2" "JISX0213-2 (Japanese)"]))

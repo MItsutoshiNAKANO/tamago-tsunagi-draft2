@@ -303,6 +303,7 @@ mode, if non-NIL."
 	;; nothing to do
 	nil
       (delete-region start end)
+      (egg-setup-invisibility-spec)
       (let ((inhibit-read-only t))
 	(its-define-select-keys egg-conversion-map)
 	(goto-char start)
@@ -317,13 +318,13 @@ mode, if non-NIL."
 	(if context
 	    (put-text-property 0 len 'egg-context context s))
 	(if egg-conversion-fence-invisible
-	    (put-text-property 0 len 'invisible t s))
+	    (put-text-property 0 len 'invisible 'egg s))
 	(insert s)
 	(setq s (copy-sequence egg-conversion-fence-close)
 	      len (length s))
 	(set-text-properties 0 len '(read-only t rear-nonsticky t egg-end t) s)
 	(if egg-conversion-fence-invisible
-	    (put-text-property 0 len 'invisible t s))
+	    (put-text-property 0 len 'invisible 'egg s))
 	(insert s)
 	(goto-char start)
 	(insert source)

@@ -645,7 +645,7 @@ Return the list of bunsetsu."
   (if (y-or-n-p (concat "「" kanji "な」は正しいですか。")) "#T15" "#T35"))
 
 (defun canna-hinshi-SAHEN-MEISHI (kanji yomi)
-  (if (y-or-n-p (concat "「" kanji "な」は正しいですか。") "#T10" "#T30")))
+  (if (y-or-n-p (concat "「" kanji "な」は正しいですか。")) "#T10" "#T30"))
 
 (defmacro canna-hinshi-DOUSHI-check-gobi ()
   '(progn
@@ -875,7 +875,7 @@ Return the list of bunsetsu."
 	  (cannarpc-close-context envd)
 	  (list kanji yomi (canna-hinshi-name hinshi) dic))
       (cannarpc-close-context envd)
-      (egg-error (cannarpc-get-error-message (- result))))
+      (egg-error "削除されませんでした。"))
     ))
 
 ;;; setup

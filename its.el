@@ -31,7 +31,9 @@
 
 ;;; Code:
 
-(require 'cl)
+(eval-when-compile
+  (require 'cl))
+
 (require 'egg-edep)
 
 (defgroup its nil
@@ -47,7 +49,13 @@
   :group 'its :type 'boolean)
 
 (defcustom its-delete-by-keystroke nil
-  "*Delete characters as if cancel input keystroke, if nin-NIL."
+  "*Delete characters as if cancel input keystroke, if nin-NIL.
+This variable is overriden by `its-delete-by-character'."
+  :group 'its :type 'boolean)
+
+(defcustom its-delete-by-character nil
+  "*Delete a character as a unit even if just after input, if nin-NIL.
+This variable override `its-delete-by-keystroke'."
   :group 'its :type 'boolean)
 
 (defcustom its-fence-invisible nil
@@ -314,7 +322,7 @@
     (let ((p (point))
 	  (str (copy-sequence "!")))
       (set-text-properties 0 1 (list 'read-only          t
-				     'invisible          t
+				     'invisible          'egg
 				     'intangible         'its-part-2
 				     'its-cursor         cursor
 				     'point-entered      'egg-enter/leave-fence
@@ -352,6 +360,7 @@
 	(error "invalid fence"))
     ;; Put open-fence before inhibit-read-only to detect read-only
     (insert (if its-context its-fence-continue its-fence-open))
+    (egg-setup-invisibility-spec)
     (let ((inhibit-read-only t))
       (setq p1 (point))
       (add-text-properties p p1 open-props)
@@ -360,7 +369,7 @@
       (insert its-fence-close)
       (add-text-properties p1 (point) close-props)
       (if its-fence-invisible
-	  (put-text-property p (point) 'invisible t))
+	  (put-text-property p (point) 'invisible 'egg))
       (put-text-property p (point) 'read-only t)
       (goto-char p1)
       (its-define-select-keys its-mode-map t)
@@ -1010,7 +1019,7 @@ Return last state."
 	(cursor (get-text-property (point) 'its-cursor)))
     (if (null syl)
 	(signal 'beginning-of-buffer nil)
-      (if (eq cursor t)
+      (if (or (eq cursor t) (and cursor its-delete-by-character))
 	  (its-delete-backward-SYL-internal n killflag)
 	(its-delete-backward-within-SYL syl n killflag)))))
 

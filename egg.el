@@ -30,7 +30,9 @@
 
 ;;; Code:
 
-(require 'cl)
+(eval-when-compile
+  (require 'cl))
+
 (require 'egg-edep)
 
 (autoload 'egg-simple-input-method "egg-sim"
@@ -192,6 +194,13 @@
 	(setq prop (cddr prop)))
       (setq p (next-property-change p object to)))
     (remove-text-properties from to props object)))
+
+(defun egg-setup-invisibility-spec ()
+  (if (listp buffer-invisibility-spec)
+      (unless (condition-case nil (memq 'egg buffer-invisibility-spec) (error))
+	(setq buffer-invisibility-spec (cons 'egg buffer-invisibility-spec)))
+    (unless (eq buffer-invisibility-spec t)
+      (setq buffer-invisibility-spec (list 'egg buffer-invisibility-spec)))))
 
 (defvar egg-mark-list nil)
 (defvar egg-suppress-marking nil)

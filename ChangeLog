@@ -1,3 +1,23 @@
+2001-05-22  KATAYAMA Yoshio <kate@pfu.fujitsu.com>
+
+	* its.el (its-delete-by-character): New customizable variable.
+	(its-delete-backward-SYL): Delete a character as a unit even if
+	just after input, if its-delete-by-character is non-NIL.
+
+2001-04-16  KATAYAMA Yoshio <kate@pfu.co.jp>
+
+	* egg.el (egg-setup-invisibility-spec): New function for setup
+	buffer-invisibilty-spec.
+
+	* its.el (its-setup-fence-mode): Change the value of invisible
+	property to egg.
+
+	* egg-cnv.el (egg-convert-region): Change the value of invisible
+	property to egg.
+
+        * jisx0213.el: Correct JIS X 0213 definition. (suggested by
+        T. Kawabata)
+
 2000-06-02  KATAYAMA Yoshio <kate@pfu.co.jp>
 
 	* egg/wnn.el (wnn): Fix docstring.

@@ -1,3 +1,16 @@
+2002-08-23  NIIBE Yutaka  <gniibe@m17n.org>
+
+	* AUTHORS (NIIBE Yutaka): Updated.
+	* egg-mlh.el: Update e-mail address.
+
+	* leim-list.el: Removed eval-when contstuct.  Reoved "loading
+	another" feature.
+	(egg-activate-anthy): Added.
+
+2002-08-23  Katsumi Yamaoka  <yamaoka@jpl.org>, NIIBE Yutaka  <gniibe@m17n.org>
+
+	* egg-util.el: Removed.
+
 2002-08-08  NIIBE Yutaka  <gniibe@m17n.org>
 
 	* Makefile.in (EGGSRCS): Added anthy.el and anthyipc.el

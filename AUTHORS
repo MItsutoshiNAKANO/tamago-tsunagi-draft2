@@ -4,16 +4,17 @@ KAWABATA, Taichi  <kawabata@exa.onlab.ntt.co.jp>
 MORIOKA Tomohiko  <tomo@etl.go.jp>
 	Use of custom.
 
-NIIBE Yutaka <gniibe@chroot.org>
+NIIBE Yutaka <gniibe@m17n.org>
 	Design a part of ITS programming.
 	Wrote ITS:
 	    its.el
 	    its/hira.el
-	Wrote tamago.el, menudiag.el, tamago-cnv.el, tamago-comm.el,
-	and tamago-mlh.el.
+	Wrote egg.el, menudiag.el, egg-cnv.el, egg-com.el,
+	and egg-mlh.el.
 	Wrote backend conversion engine interface:
-	    SJ3: tamago-lib/sj3.el, tamago-lib/sj3rpc.el,
-	    WNN: tamago-lib/wnn.el, and tamago-lib/wnnrpc.el.
+	    ANTHY: egg/anthy.el, egg/anthyipc.el, 
+	    SJ3: egg/sj3.el, egg/sj3rpc.el,
+	    WNN: egg/wnn.el, and egg/wnnrpc.el.
 
 KATAYAMA Yoshio <kate@pfu.co.jp>
 	Design ITS programming.

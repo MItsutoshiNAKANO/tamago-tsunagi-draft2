@@ -1,6 +1,8 @@
 2002-08-08  NIIBE Yutaka  <gniibe@m17n.org>
 
 	* Makefile.in (EGGSRCS): Added anthy.el and anthyipc.el
+	(srcdir, top_srcdir, VPATH): Added.
+	(DEPS): Use top_srcdir.
 
 	Added ANTHY support.
 	* egg/anthy.el egg/anthyipc.el: New files.

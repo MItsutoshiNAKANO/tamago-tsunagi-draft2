@@ -8,6 +8,10 @@
 .SUFFIXES:
 SHELL	= @SHELL@
 
+srcdir = @srcdir@
+top_srcdir = @top_srcdir@
+VPATH = @srcdir@
+
 #------------------------------------------------
 #  Configuration parameters
 #------------------------------------------------
@@ -31,7 +35,7 @@ INSTALL_INFO = install-info
 #       ;; install files into the emacs site-lisp directory
 #       ;; ex. /usr/local/share/emacs/site-lisp/egg
 
-DEPS	= -l ./docomp.el -l ./jisx0213.el
+DEPS	= -l $(top_srcdir)/docomp.el -l $(top_srcdir)/jisx0213.el
 BATCHFLAGS	= -batch -q -no-site-file -no-init-file
 
 ETCS	= Makefile docomp.el \

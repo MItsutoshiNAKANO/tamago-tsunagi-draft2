@@ -1,4 +1,4 @@
-2002-07-20  SAITO Takuya <reed@lily.freemail.ne.jp>
+2002-08-02  SAITO Takuya <reed@lily.freemail.ne.jp>
 
 	* its.el (its-previous-line): point-mim -> point-min (typo)
 

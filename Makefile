@@ -7,25 +7,15 @@
 
 #---------------------------------------
 # (1) make
-#	;; compile *.el files and make leim-list.el
-# (2) make install-system
-#	;; install files into ${INSDIR} and ${LEIMDIR}
-# (3) make install-user
-#	;; install your initialization files at your home directory
+#	;; compile *.el files
+# (2) make install
+#	;; install files into the emacs site-lisp directory
+#       ;; ex. /usr/local/share/emacs/site-lisp/egg
 #------------------------------------------------
 #  Configuration parameters
 #------------------------------------------------
-# Emacs initialization file at your home directory
-	DOTEMACS= ${HOME}/.emacs
-# egg initialization file at your home directory
-	STARTUP	= .eggrc
-	EGGRC	= ${HOME}/${START}
 # emacs you use
 	EMACS	= /usr/local/bin/emacs
-# Egg does not depend on the emacs version (We hope...)
-	INSDIR	= /usr/local/share/emacs/site-lisp/egg
-# The directory where there is leim-list.el in it.
-	LEIMDIR	= /usr/local/share/emacs/20.4/leim
 # Programs
 	INSTALL	= /usr/sbin/install
 	CP	= /bin/cp
@@ -34,16 +24,18 @@
 	MKDIR	= /usr/bin/mkdir
 #------------------------------------------------
 
-
 DEPS = -l ./docomp.el
-BATCHFLAGS = -batch -q -no-site-file
+BATCHFLAGS = -batch -q -no-site-file -no-init-file
 
 .SUFFIXES: .el .elc
 
-ETCS =	Makefile docomp.el eggrc leim-list-egg.el egg-dotemacs \
-	AUTHORS ChangeLog README TODO PROBLEMS
+ETCS =	Makefile docomp.el egg-dotemacs \
+	AUTHORS ChangeLog README TODO PROBLEMS make-dirs.el
 
-SRCS = menudiag.el its.el egg-edep.el \
+ELS  =  eggrc leim-list.el
+
+SRCS = egg-util.el \
+       menudiag.el its.el egg-edep.el \
        its/ascii.el \
        its/bixing.el \
        its/erpin.el \
@@ -66,52 +58,35 @@ SRCS = menudiag.el its.el egg-edep.el \
 
 ELCS = ${SRCS:.el=.elc}
 
-DIST = ${ETCS} ${SRCS}
+DIST = ${ETCS} ${SRCS} ${ELS}
 
 .el.elc:
 	${EMACS} ${BATCHFLAGS} ${DEPS} -f batch-byte-compile $<
 
-all: ${ELCS} leim-list.el
+all: ${ELCS} dirs
 
-leim-list.el: leim-list-egg.el
-	@if (grep ";;; leim-list-egg.el" \
-	          ${LEIMDIR}/leim-list.el 2>&1) >/dev/null; then \
-	  echo Egg setup already exists in ${LEIMDIR}/leim-list.el; \
-	  cat ${LEIMDIR}/leim-list.el  >leim-list.el; \
-	else \
-	  cat ${LEIMDIR}/leim-list.el leim-list-egg.el >leim-list.el; \
-	fi
+dirs:	${EMACS}
+	@${EMACS} ${BATCHFLAGS} -l ./make-dirs.el 2> /dev/null
 
 clean: 
-	${RM} -f ${ELCS} leim-list.el
+	${RM} -f ${ELCS} dirs *~ */*~
 
-install: install-system
+install: install-site
 
-install-system: all
-	if [ ! -d ${INSDIR} ]; then mkdir -p ${INSDIR}; fi
-	tar cf - ${SRCS} ${ELCS} | (cd ${INSDIR} && tar xvf -)
-	${CP} leim-list.el ${INSDIR}
+install-site: all
+	@. ./dirs; \
+	echo "Egg system will be installed in $${INSDIR}/egg...."; \
+	if [ -d $${INSDIR}/egg ]; then \
+           echo "Clean up the previsous installation...."; \
+           ${RM} -rf $${INSDIR}/egg; fi ; \
+	mkdir -p $${INSDIR}/egg; \
+	tar cf - ${SRCS} ${ELCS} ${ELS} | (cd $${INSDIR}/egg && tar xpBf -)
 
-uninstall-system:
-	if [ -d ${INSDIR} ]; then \
-	  ${RM} -rf ${INSDIR}; \
+uninstall-site:
+	. ./dirs; \
+	if [ -d $${INSDIR}/egg ]; then \
+	  ${RM} -rf $${INSDIR}/egg; \
 	fi
-
-
-install-user: dotemacs ${EGGRC}
-
-dotemacs: egg-dotemacs
-	@if (grep "^;;; Emacs/Egg Configuration" \
-                  $(DOTEMACS) 2>&1) >/dev/null; then \
-          echo Emacs/Egg setup already exists in $(DOTEMACS); \
-	else \
-	  cat egg-dotemacs >> ${DOTEMACS} ; \
-	  echo "(setq egg-startup-file \"${STARTUP}\")" >>${DOTEMACS} ; \
-	  echo "Added Emacs/Egg setup to $(DOTEMACS)"; \
-	fi
-
-${EGGRC}: eggrc
-	$(CP) eggrc ${EGGRC}
 
 # DEPENDENCIES
 egg/sj3rpc.elc: egg-com.elc egg/sj3.elc
@@ -122,23 +97,4 @@ egg.elc its/ascii.elc its/erpin.elc its/hankata.elc \
        its/hangul.elc its/kata.elc its/quanjiao.elc \
        its/zenkaku.elc its/zhuyin.elc: its-keydef.elc
 
-distclean:
-	rm -f ${ELCS} leim-list.el *~
 
-###  Source code maintainance
-DATE=$(shell date "+%y%m%d")
-
-dist: distclean
-	rm -rf ../egg-${DATE}
-	mkdir ../egg-${DATE}
-	tar -c -f - ${DIST} | tar Cxf ../egg-${DATE} -
-	(cd ../egg-${DATE}; \
-	 sed "/^### Source code maintainance/,\$$d" <Makefile >Makefile.dist; \
-	 mv -f Makefile.dist Makefile)
-	(cd ..; tar cvzf egg-${DATE}.tar.gz egg-${DATE})
-
-working-ss: distclean
-	rm -rf ../egg-snap-${DATE}
-	mkdir ../egg-snap-${DATE}
-	tar -c -f - . | tar Cxf ../egg-snap-${DATE} -
-	(cd ..; tar cvzf egg-snap-${DATE}.tar.gz egg-snap-${DATE})

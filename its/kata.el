@@ -1,10 +1,10 @@
 ;;; its/kata.el --- Katakana Input in Egg Input Method Architecture
 
+
 ;; Copyright (C) 1995 Electrotechnical Laboratory, JAPAN.
 ;; Licensed to the Free Software Foundation.
 
 ;; Author: Satoru Tomura <tomura@etl.go.jp>
-;;         jiro@math.keio.ac.jp (TANAKA Jiro)
 
 ;; Maintainer: TOMURA Satoru <tomura@etl.go.jp>
 

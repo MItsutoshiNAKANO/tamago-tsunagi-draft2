@@ -1,9 +1,8 @@
 ;;; its/hankata.el --- Hnakaku Katakana Input in Egg Input Method Architecture
 
-;; Copyright (C) 1995 Electrotechnical Laboratory, JAPAN.
-;; Licensed to the Free Software Foundation.
+;; Copyright (C) 1999, 2000 Free Software Foundation, Inc
 
-;; Author: Satoru Tomura <tomura@etl.go.jp>
+;; Author: NIIBE Yutaka <gniibe@chroot.org>
 
 ;; Maintainer: TOMURA Satoru <tomura@etl.go.jp>
 

@@ -1,14 +1,13 @@
 ;;; its-keydef.el
 
-;; Copyright (C) 1999, 2000 Free Software Foundation, Inc
+;; Copyright (C) 1999, 2000 PFU LIMITED
 
-;; Author: NIIBE Yutaka <gniibe@chroot.org>
+;; Author: KATAYAMA Yoshio <kate@pfu.co.jp>
 
 ;; Maintainer: TOMURA Satoru <tomura@etl.go.jp>
 
 ;; Keywords: mule, multilingual, input method
 
-;; Project Leader: Satoru Tomura <tomura@etl.go.jp>
 ;; Keywords: mule, multilingual, input method
 
 ;; This file is part of EGG.

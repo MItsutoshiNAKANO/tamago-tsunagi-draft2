@@ -1308,6 +1308,38 @@ Return last state."
     (setq its-stroke-input-alist
 	  (append alist its-stroke-input-alist))))
 
+(defun its-hiragana ()
+  ;; hiragana-region for input-buffer
+  (interactive)
+  (let* ((inhibit-read-only t)
+	 (start (if (get-text-property (1- (point)) 'its-start)
+		    (point)
+		  (previous-single-property-change (point) 'its-start)))
+	 (end (if (get-text-property (point) 'its-end)
+		  (point)
+		(next-single-property-change (point) 'its-end)))
+	 (old-str (buffer-substring-no-properties start (1- end)))
+	 (new-str (japanese-hiragana old-str)))
+    (delete-region start end)
+    (insert new-str)
+    (its-put-cursor t)))
+
+(defun its-katakana ()
+  ;; katakana-region for input-buffer
+  (interactive)
+  (let* ((inhibit-read-only t)
+	 (start (if (get-text-property (1- (point)) 'its-start)
+		    (point)
+		  (previous-single-property-change (point) 'its-start)))
+	 (end (if (get-text-property (point) 'its-end)
+		  (point)
+		(next-single-property-change (point) 'its-end)))
+	 (old-str (buffer-substring-no-properties start (1- end)))
+	 (new-str (japanese-katakana old-str)))
+    (delete-region start end)
+    (insert new-str)
+    (its-put-cursor t)))
+
 (defun its-mode ()
   "\\{its-mode-map}"
   ;; dummy function to get docstring

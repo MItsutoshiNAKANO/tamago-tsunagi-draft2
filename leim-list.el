@@ -97,6 +97,9 @@
 (defgroup wnn nil ""
   :group 'egg :load "egg/wnn")
 
+(defgroup sj3 nil ""
+  :group 'egg :load "egg/sj3")
+
 (defgroup its nil "" 
   :group 'egg :load "its")
 

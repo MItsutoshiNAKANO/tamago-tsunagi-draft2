@@ -569,6 +569,10 @@ next/previous-candidate, if positive number N."
     (define-key map [left]   'egg-backward-bunsetsu)
     (define-key map " "      'egg-next-candidate)
     (define-key map "/"      'egg-exit-conversion)
+    ;;;(define-key map "\M-h"   'egg-hiragana)
+    ;;;(define-key map "\M-k"   'egg-katakana)
+    ;;;(define-key map "\M-<"   'egg-hankaku)
+    ;;;(define-key map "\M->"   'egg-zenkaku)
     map)
   "Keymap for EGG Conversion mode.")
 

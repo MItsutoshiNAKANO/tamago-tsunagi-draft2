@@ -31,8 +31,21 @@
 
 ;;; Code:
 
-
+(require 'egg)
 (require 'egg-edep)
+
+(defgroup sj3 nil
+  "SJ3 interface for Tamago 4"
+  :group 'egg)
+
+(defcustom  sj3-hostname "localhost"
+  "*Hostname of SJ3 server"
+  :group 'sj3 :type 'string)
+
+(defcustom  sj3-server-port 3086 
+  "*Port number of SJ3 server"
+  :group 'sj3 :type 'integer)
+
 
 (eval-when-compile
   (defmacro SJ3-const (c)
@@ -54,10 +67,7 @@
 
 (egg-set-finalize-backend '(sj3-finalize-backend))
 
-(defvar sj3-server-port 3086 "Port number of SJ3 server")
 (defvar sj3-stdy-size 0 "STDYSIZE of SJ3 server")
-(defvar sj3-hostname "localhost"
-  "Hostname of SJ3 server")
 
 (defvar sj3-open-message)
 

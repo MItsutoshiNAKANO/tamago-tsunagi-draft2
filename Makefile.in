@@ -42,16 +42,22 @@ INITELS	= eggrc leim-list.el
 SRCS	= ${TOPSRCS} ${EGGSRCS} ${ITSSRCS}
 
 TOPSRCS	= \
-	egg-util.el \
-	menudiag.el its.el egg-edep.el \
-	egg-mlh.el egg-cnv.el egg-com.el \
 	egg.el \
+	egg-edep.el \
+	egg-com.el \
+	egg-cnv.el \
+	egg-util.el \
+	egg-mlh.el \
+	menudiag.el \
+	its.el \
 
+#
 EGGSRCS	= \
 	egg/cannarpc.el egg/canna.el \
 	egg/sj3rpc.el egg/sj3.el \
 	egg/wnnrpc.el egg/wnn.el \
 
+#
 ITSSRCS	= \
 	its/ascii.el \
 	its/bixing.el \
@@ -68,6 +74,7 @@ ITSSRCS	= \
 	its/zhuyin.el \
 	its-keydef.el \
 
+#
 ELCS	= ${SRCS:.el=.elc}
 
 TOPELCS	= ${TOPSRCS:.el=.elc}
@@ -78,16 +85,18 @@ ITSELCS	= ${ITSSRCS:.el=.elc}
 
 DIST	= ${ETCS} ${SRCS} ${INITELS}
 
+all: ${ELCS}
 
 .SUFFIXES: .el .elc
 
 .el.elc:
 	${EMACS} ${BATCHFLAGS} ${DEPS} -f batch-byte-compile $<
 
-all: ${ELCS}
-
 clean: 
-	rm -f ${ELCS} config.* *~ */*~ Makefile
+	rm -f ${ELCS} 
+
+distclean: 
+	rm -f ${ELCS} config.* *~ */*~ Makefile \#* .\#* */\#* */.\#*
 
 install: install-site
 

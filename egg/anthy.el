@@ -191,7 +191,6 @@ Return the list of bunsetsu."
 
 ;; Returns list of list of bunsetsu
 (defun anthy-resize-segment (bunsetsu-list prev-b next-b len major)
-  (message (format "%s %s %s %s %s" bunsetsu-list prev-b next-b len major))
   (let ((bunsetsu (car bunsetsu-list)))
     (let ((env (anthybunsetsu-get-env bunsetsu))
 	  (seg-no (anthybunsetsu-get-seg-no bunsetsu))

@@ -1,9 +1,10 @@
-;;; leim-list-egg.el --- Egg setup for leim API
+;;; leim-list.el --- Egg setup for leim API
 
 ;; Copyright (C) 1999, 2000 Free Software Foundation, Inc
 
 ;; Author: NIIBE Yutaka <gniibe@chroot.org>
 ;;         KATAYAMA Yoshio <kate@pfu.co.jp>
+;;         TOMURA Satoru <tomura@etl.go.jp>
 
 ;; Maintainer: TOMURA Satoru <tomura@etl.go.jp>
 
@@ -29,9 +30,6 @@
 ;;; Commentary:
 
 ;;; Code:
-
-;;; leim-list-egg.el --- Egg setup for leim API
-;;; CAUTION: Don't delete the above line.
 
 (when site-run-file
   (autoload 'egg-activate-wnn "egg/wnn" "Activate Wnn backend of Tamagotchy." t)
@@ -89,20 +87,31 @@
   (set-language-info "Chinese-CNS" 'input-method "chinese-cns-egg-wnn-py")
   (set-language-info "Korean"      'input-method "korean-egg-wnn")
 
-  (require 'egg)
-  (require 'its/hira)
+(defgroup leim nil 
+  "LEIM stands for Libraries of Emacs Input Methods."
+  :group 'mule)
+
+(defgroup egg nil "" 
+  :group 'leim :load "egg")
+
+(defgroup wnn nil ""
+  :group 'egg :load "egg/wnn")
+
+(defgroup its nil "" 
+  :group 'egg :load "its")
+
+(defgroup hira nil ""
+  :group 'its :load "its/hira")
 
 ;;;;
 
   (require 'egg-util)
 
   (defun load-leim-list-except-this ()
-    (load-libraries "leim-list" (cdr-safe
-				 (member (substring 
-					  (file-name-directory
-					   load-file-name)
-					  0 -1)
-					 load-path))))
+    (load-libraries "leim-list" 
+		    (cdr-safe
+		     (member (directory-file-name (file-name-directory load-file-name))
+			     load-path))))
 
   (message "Finished loading %s \n   and load others..." load-file-name)
   (load-leim-list-except-this)

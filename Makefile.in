@@ -58,6 +58,7 @@ EGGSRCS	= \
 	egg/cannarpc.el egg/canna.el \
 	egg/sj3rpc.el egg/sj3.el \
 	egg/wnnrpc.el egg/wnn.el \
+	egg/anthyipc.el egg/anthy.el
 
 #
 ITSSRCS	= \

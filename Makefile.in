@@ -35,7 +35,7 @@ INSTALL_INFO = install-info
 #       ;; install files into the emacs site-lisp directory
 #       ;; ex. /usr/local/share/emacs/site-lisp/egg
 
-DEPS	= -l $(top_srcdir)/docomp.el -l $(top_srcdir)/jisx0213.el
+DEPS	= -l $(top_srcdir)/docomp.el
 BATCHFLAGS	= -batch -q -no-site-file -no-init-file
 
 ETCS	= Makefile docomp.el \
@@ -52,7 +52,6 @@ TOPSRCS	= \
 	egg-cnv.el \
 	egg-mlh.el \
 	egg-sim.el \
-	egg-x0213.el \
 	menudiag.el \
 	its.el \
 	its-keydef.el \
@@ -65,9 +64,10 @@ EGGSRCS	= \
 	egg/anthyipc.el egg/anthy.el
 
 #
+AYNU	= @HAVE_JISX0213@ its/aynu.el
+
 ITSSRCS	= \
 	its/ascii.el \
-	its/aynu.el \
 	its/bixing.el \
 	its/erpin.el \
 	its/greek.el \
@@ -81,6 +81,7 @@ ITSSRCS	= \
 	its/quanjiao.el \
 	its/zenkaku.el \
 	its/zhuyin.el \
+	${AYNU}
 
 #
 ELCS	= ${SRCS:.el=.elc}
@@ -92,6 +93,7 @@ EGGELCS	= ${EGGSRCS:.el=.elc}
 ITSELCS	= ${ITSSRCS:.el=.elc}
 
 DIST	= ${ETCS} ${SRCS} ${INITELS}
+
 
 all: ${ELCS}
 

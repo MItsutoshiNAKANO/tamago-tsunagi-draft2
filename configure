@@ -637,6 +637,15 @@ fi
 
 
 
+echo $ac_n "checking jisx0213""... $ac_c" 1>&6
+echo "configure:642: checking jisx0213" >&5
+if emacs -batch -q -no-site-file -no-init-file -l ${srcdir}/check-jisx0213.el; then
+  echo "yes"; HAVE_JISX0213=""
+else
+  echo "no"; HAVE_JISX0213="# "
+fi
+
+
 lispdir=${datadir}/emacs/site-lisp
 
 trap '' 1 2 15
@@ -788,6 +797,7 @@ s%@INSTALL_PROGRAM@%$INSTALL_PROGRAM%g
 s%@INSTALL_SCRIPT@%$INSTALL_SCRIPT%g
 s%@INSTALL_DATA@%$INSTALL_DATA%g
 s%@SET_MAKE@%$SET_MAKE%g
+s%@HAVE_JISX0213@%$HAVE_JISX0213%g
 s%@lispdir@%$lispdir%g
 
 CEOF

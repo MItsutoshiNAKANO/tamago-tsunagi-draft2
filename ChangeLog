@@ -1,3 +1,17 @@
+2002-09-09  NIIBE Yutaka  <gniibe@m17n.org>
+
+	Check JIS x0213 support at compile time.
+	* check-jisx0213.el: New file.
+	* configure.in: Check if JIS X0213 is supported or not.
+	* Makefile.in (TOPSRCS): Remove egg-x0213.el.
+	(DEPS): Don't load jisx0213.el.
+	(ITSSRCS): Removed its/aynu.el.
+	(AYNU): New variable.
+
+	Bug fix.
+	* its/thai.el (its-thai-add-vowel, its-thai-add-tone): Bug fixes.
+	Just call compose-string.
+	
 2002-08-26  ISHIKAWA Mutsumi <ishikawa@linux.or.jp>, 
 	Takahiro Kambe <taca@sky.yamashina.kyoto.jp>, 
 	Katsumi Yamaoka  <yamaoka@jpl.org>

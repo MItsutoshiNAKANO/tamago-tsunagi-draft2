@@ -69,7 +69,7 @@
 	(setq next-keyseq (concat keyseq (car (car vowel)))
 	      next-output (concat output (cdr (car vowel)))
 	      vowel (cdr vowel))
-        (its-defrule next-keyseq `(eval compose-string ,next-output))
+        (its-defrule next-keyseq (compose-string next-output))
 	(its-thai-add-tone next-keyseq next-output tone))))
 
   (defun its-thai-add-tone (keyseq output tone)
@@ -78,7 +78,7 @@
 	(setq next-keyseq (concat keyseq (car (car tone)))
 	      next-output (concat output (cdr (car tone)))
               tone (cdr tone))
-        (its-defrule next-keyseq `(eval compose-string ,next-output))))))
+        (its-defrule next-keyseq (compose-string next-output))))))
 
 ;; Thai Kesmanee keyboard support.
 
@@ -93,7 +93,7 @@
     ("4"  ",T@(B" consonant)    ("$"  ",Ts(B")
     ("5"  ",T6(B" consonant)    ("%"  ",Tt(B")
     ("6"  ",TX(B" vowel)        ("^"  ",TY(B" vowel)
-    ("7"  ",TV(B" vowel)        ("&"  "0,TQi1(B" vowel)
+    ("7"  ",TV(B" vowel)        ("&"  "0,TQi(B1" vowel)
     ("8"  ",T$(B" consonant)    ("*"  ",Tu(B")
     ("9"  ",T5(B" consonant)    ("("  ",Tv(B")
     ("0"  ",T((B" consonant)    (")"  ",Tw(B")

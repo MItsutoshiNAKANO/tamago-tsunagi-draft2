@@ -1,5 +1,5 @@
 
-			   Tamago Versio 4
+			   Tamago Version 4
 
 		   NIIBE Yutaka <gniibe@chroot.org>
 		   KATAYAMA Yoshio <kate@pfu.co.jp>

@@ -46,6 +46,16 @@
   "*Port number of SJ3 server"
   :group 'sj3 :type 'integer)
 
+(defcustom sj3-server-version 2
+  "Major version number of SJ3 server."
+  :group 'sj3
+  :type '(choice (const 1) (const 2)))
+
+(defcustom sj3-server-coding-system-list '(shift_jis euc-japan)
+  "List of coding systems for SJ3 server v1 and v2."
+  :group 'sj3
+  :type '(list (symbol :tag "v1") (symbol :tag "v2")))
+
 
 (eval-when-compile
   (defmacro SJ3-const (c)
@@ -309,7 +319,9 @@ Return the list of bunsetsu."
 	(setq stdy (sj3bunsetsu-get-stdy bunsetsu))
 	(if stdy
 	    (sj3rpc-bunsetsu-stdy env stdy))
-	(if (setq kugiri-changed (sj3bunsetsu-get-kugiri-changed bunsetsu))
+	(if (and l
+		 (setq kugiri-changed (sj3bunsetsu-get-kugiri-changed
+				       bunsetsu)))
 	    (let ((yomi1 (sj3bunsetsu-get-source bunsetsu))
 		  (yomi2 (sj3bunsetsu-get-source (car l))))
 	      (if (/= kugiri-changed (length yomi1))

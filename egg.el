@@ -33,6 +33,8 @@
 (require 'cl)
 (require 'egg-edep)
 
+(autoload 'egg-simple-input-method "egg-sim")
+
 (defgroup egg nil
   "Tamago Version 4")
 
@@ -97,7 +99,7 @@
   "Generate modefull keymap for EGG mode."  
   (let ((map (make-sparse-keymap))
 	(i 33))
-    (define-key map "\C-_" 'egg-jis-code-input)
+    (define-key map "\C-^" 'egg-simple-input-method)
     (while (< i 127)
       (define-key map (vector i) 'egg-self-insert-char)
       (setq i (1+ i)))
@@ -109,7 +111,7 @@
   "Generate modeless keymap for EGG mode."
   (let ((map (make-sparse-keymap)))
     (define-key map " " 'mlh-space-bar-backward-henkan)
-    (define-key map "\C-_" 'egg-jis-code-input)
+    (define-key map "\C-^" 'egg-simple-input-method)
     (set-keymap-parent map (current-local-map))
     map))
 
@@ -190,23 +192,21 @@
       (when (marker-buffer mb)
 	(set-buffer (marker-buffer mb))
 	(let ((before-change-functions nil) (after-change-functions nil))
-	  (save-restriction
-	    (widen)
-	    (setq b (max mb (point-min))
-		  e (min me (point-max)))
-	    (set-marker mb nil)
-	    (set-marker me nil)
-	    (while (< b e)
-	      (if (null (get-text-property b 'egg-face))
-		  (setq b (next-single-property-change b 'egg-face nil e)))
-	      (setq p (next-single-property-change b 'egg-face nil e))
-	      (when (< b p)
-		(goto-char b)
-		(setq str (buffer-substring b p))
-		(delete-region b p)
-		(remove-text-properties 0 (- p b) '(face) str)
-		(insert str)
-		(setq b p)))))))
+	  (save-excursion
+	    (save-restriction
+	      (widen)
+	      (setq b (max mb (point-min))
+		    e (min me (point-max)))
+	      (set-marker mb nil)
+	      (set-marker me nil)
+	      (while (< b e)
+		(if (null (get-text-property b 'egg-face))
+		    (setq b (next-single-property-change b 'egg-face nil e)))
+		(setq p (next-single-property-change b 'egg-face nil e))
+		(when (< b p)
+		  (goto-char b)
+		  (remove-text-properties 0 (- p b) '(face))
+		  (setq b p))))))))
     (set-buffer org-buffer)
     (goto-char org-point)))
 

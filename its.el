@@ -272,10 +272,10 @@
     ;;
     (define-key map "\M-p" 'its-previous-map)
     (define-key map "\M-n" 'its-next-map)
-    ;;;(define-key map "\M-h" 'its-hiragana) ; hiragana-region for input-buffer
-    ;;;(define-key map "\M-k" 'its-katakana)
-    ;;;(define-key map "\M-<" 'its-hankaku)
-    ;;;(define-key map "\M->" 'its-zenkaku)
+    (define-key map "\M-h" 'its-hiragana) ; hiragana-region for input-buffer
+    (define-key map "\M-k" 'its-katakana)
+    (define-key map "\M-<" 'its-hankaku)
+    (define-key map "\M->" 'its-zenkaku)
     map)
   "Keymap for ITS mode.")
 
@@ -291,17 +291,20 @@
 
 (defun its-put-cursor (cursor)
   (if (null (eq its-barf-on-invalid-keyseq 'its-keyseq-test))
-      (let ((p (point)))
-	(insert "!")
-	(add-text-properties p (point) (list 'local-map 'its-mode-map
-					     'read-only t
-					     'invisible t
-					     'intangible 'its-part-2
-					     'its-cursor cursor))
+      (let ((p (point))
+	    (str (copy-sequence "!")))
+	(set-text-properties 0 1 (list 'local-map 'its-mode-map
+				       'read-only t
+				       'invisible t
+				       'intangible 'its-part-2
+				       'its-cursor cursor)
+			     str)
+	(insert str)
 	(goto-char p))))
 
-(defsubst its-set-cursor-status (cursor)
-  (put-text-property (point) (1+ (point)) 'its-cursor cursor)
+(defun its-set-cursor-status (cursor)
+  (delete-region (point) (1+ (point)))
+  (its-put-cursor cursor)
   cursor)
 
 (defvar its-context nil)
@@ -855,62 +858,52 @@ Return last state."
     (put-text-property 0 (- end beg) 'intangible 'its-part-2 str)
     (insert str)))
 
+(defun its-search-beginning ()
+  (if (get-text-property (1- (point)) 'its-start)
+      (point)
+    (previous-single-property-change (point) 'its-start)))
+
+(defun its-search-end ()
+  (if (get-text-property (point) 'its-end)
+      (point)
+    (next-single-property-change (point) 'its-end)))
+
 (defun its-beginning-of-input-buffer ()
   (interactive)
   (let ((inhibit-read-only t))
     (its-input-end)
-    (if (not (get-text-property (1- (point)) 'its-start))
-	(let ((begpos (previous-single-property-change (point) 'its-start)))
-	  ;; Make SYLs have property of "part 2"
-	  (its-set-part-2 begpos (point))
-	  (goto-char begpos)))
+    (let ((begpos (its-search-beginning)))
+      (its-set-part-2 begpos (point))
+      (goto-char begpos))
     (its-put-cursor t)))
 
 (defun its-end-of-input-buffer ()
   (interactive)
   (let ((inhibit-read-only t))
     (its-input-end)
-    (if (not (get-text-property (point) 'its-end))
-	(let ((endpos (next-single-property-change (point) 'its-end)))
-	  ;; Make SYLs have property of "part 1"
-	  (its-set-part-1 (point) endpos)
-	  (goto-char endpos)))
+    (let ((endpos (its-search-end)))
+      (its-set-part-1 (point) endpos)
+      (goto-char endpos))
     (its-put-cursor t)))
 
 (defun its-kill-line (n)
   (interactive "p")
-  (let ((inhibit-read-only t)
-	(p (point)))
+  (let ((inhibit-read-only t))
     (its-input-end)
     (if (> n 0)
-	(cond
-	 ((get-text-property (1- (point)) 'its-start)
-	  (its-cancel-input))
-	 ((get-text-property (point) 'its-end)
+	(if (= (its-search-beginning) (point))
+	    (its-cancel-input)
+	  (delete-region (its-search-end) (point))
 	  (its-put-cursor t))
-	 (t
-	  (delete-region (next-single-property-change (point) 'its-end)
-			 (point))
-	  (its-put-cursor t)))
-      (cond
-       ((get-text-property (point) 'its-end)
-	(its-cancel-input))
-       ((get-text-property (1- (point)) 'its-start)
-	(its-put-cursor t))
-       (t
-	(delete-region (point)
-		       (previous-single-property-change (point) 'its-start))
-	(its-put-cursor t))))))
+      (if (= (its-search-end) (point))
+	  (its-cancel-input)
+	(delete-region (its-search-beginning) (point))
+	(its-put-cursor t)))))
 
 (defun its-cancel-input ()
   (interactive)
   (let ((inhibit-read-only t))
-    (delete-region (if (get-text-property (1- (point)) 'its-start)
-		       (point)
-		     (previous-single-property-change (point) 'its-start))
-		   (if (get-text-property (point) 'its-end)
-		       (point)
-		     (next-single-property-change (point) 'its-end)))
+    (delete-region (its-search-beginning) (its-search-end))
     (its-put-cursor t)
     (its-exit-mode-internal)))
 
@@ -1193,16 +1186,12 @@ Return last state."
     ;; Delete CURSOR
     (delete-region (point) (1+ (point)))
     ;; Delete open fence
-    (setq s (if (get-text-property (1- (point)) 'its-start)
-		(point)
-	      (previous-single-property-change (point) 'its-start))
-	 start (previous-single-property-change s 'its-start nil (point-min))
-	 context (get-text-property start 'its-context))
+    (setq s (its-search-beginning)
+	  start (previous-single-property-change s 'its-start nil (point-min))
+	  context (get-text-property start 'its-context))
     (delete-region start s)
     ;; Delete close fence
-    (setq end (if (get-text-property (point) 'its-end)
-		  (point)
-		(next-single-property-change (point) 'its-end)))
+    (setq end (its-search-end))
     (delete-region end
 		   (next-single-property-change end 'its-end nil (point-max)))
     (if proceed-to-conversion
@@ -1309,8 +1298,68 @@ Return last state."
 	  (append alist its-stroke-input-alist))))
 
 ;;; its-hiragana : hiragana-region for input-buffer
+(defun its-hiragana ()
+  (interactive)
+  (let ((inhibit-read-only t))
+    (its-input-end)
+    (its-set-part-1 (point) (its-search-end))
+    (its-convert 'japanese-hiragana (its-search-beginning) (point))
+    (its-put-cursor t)))
 
 ;;; its-katakana : katanaka-region for input-buffer
+(defun its-katakana ()
+  (interactive)
+  (let ((inhibit-read-only t))
+    (its-input-end)
+    (its-set-part-1 (point) (its-search-end))
+    (its-convert 'japanese-katakana (its-search-beginning) (point))
+    (its-put-cursor t)))
+
+;;; its-hankaku : hankaku-region for input-buffer
+(defun its-hankaku ()
+  (interactive)
+  (let ((inhibit-read-only t))
+    (its-input-end)
+    (its-set-part-1 (point) (its-search-end))
+    (its-convert 'its-japanese-hankaku (its-search-beginning) (point))
+    (its-put-cursor t)))
+
+(defun its-japanese-hankaku (obj)
+  (japanese-hankaku obj 'ascii-only))
+
+;;; its-zenkaku : zenkaku-region for input-buffer
+(defun its-zenkaku ()
+  (interactive)
+  (let ((inhibit-read-only t))
+    (its-input-end)
+    (its-set-part-1 (point) (its-search-end))
+    (its-convert 'japanese-zenkaku (its-search-beginning) (point))
+    (its-put-cursor t)))
+
+(defun its-convert (func start end)
+  (let* ((goto-start (eq (point) start))
+	 (old-str (buffer-substring start end))
+	 (new-str "")
+	 (len (length old-str))
+	 (p 0)
+	 old new syl q)
+    (while (< p len)
+      (setq q (next-single-property-change p 'its-syl old-str len)
+	    old (substring old-str p q)
+	    new (copy-sequence old))
+      (set-text-properties 0 (- q p) nil new)
+      (setq new (funcall func new))
+      (if (equal new old)
+	  (setq new-str (concat new-str old))
+	(setq syl (cons (copy-sequence new) (copy-sequence new)))
+	(set-text-properties 0 (length new) (text-properties-at 0 old) new)
+	(put-text-property 0 (length new) 'its-syl syl new)
+	(setq new-str (concat new-str new)))
+      (setq p q))
+    (delete-region start end)
+    (insert new-str)
+    (if goto-start
+	(goto-char start))))
 
 (defun its-mode ()
   "\\{its-mode-map}"

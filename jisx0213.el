@@ -1,4 +1,4 @@
-;;; its/ascii.el --- ASCII Input in Egg Input Method Architecture
+;;; jisx0213.el --- Charset Definition for JIS X 0213
 
 ;; Copyright (C) 1999,2000 PFU LIMITED
 
@@ -30,29 +30,5 @@
 
 ;;; Code:
 
-(eval-when-compile
-  (require 'its))
-
-(define-its-state-machine its-up-map
-  "upcase" "aA" nil
-  "Map for upcase input."
-
-  (let ((i ? ))
-    (while (<= i ?~)
-      (its-defrule (char-to-string i) (upcase (char-to-string i)))
-      (setq i (1+ i)))))
-
-(define-its-state-machine-append its-up-map)
-
-(define-its-state-machine its-down-map
-  "downcase" "aa" nil
-  "Map for downcase input."
-
-  (let ((i ? ))
-    (while (<= i ?~)
-      (its-defrule (char-to-string i) (char-to-string i))
-      (setq i (1+ i)))))
-
-(define-its-state-machine-append its-down-map)
-
-(provide 'its/ascii)
+(define-charset nil 'japanese-jisx0213
+  [2 94 2 0 ?O 0 "JIS X 0213" "JIS X 0213" "JIS X 0213"])

@@ -31,7 +31,7 @@ INSTALL_INFO = install-info
 #       ;; install files into the emacs site-lisp directory
 #       ;; ex. /usr/local/share/emacs/site-lisp/egg
 
-DEPS	= -l ./docomp.el
+DEPS	= -l ./docomp.el -l ./jisx0213.el
 BATCHFLAGS	= -batch -q -no-site-file -no-init-file
 
 ETCS	= Makefile docomp.el \
@@ -62,6 +62,7 @@ EGGSRCS	= \
 #
 ITSSRCS	= \
 	its/ascii.el \
+	its/aynu.el \
 	its/bixing.el \
 	its/erpin.el \
 	its/hankata.el \
@@ -138,8 +139,8 @@ uninstall-site:
 egg/sj3rpc.elc: egg-com.elc egg/sj3.elc
 egg/wnnrpc.elc: egg-com.elc egg/wnn.elc
 
-egg.elc its/ascii.elc its/erpin.elc its/hankata.elc \
-its/hira.elc its/jeonkak.elc its/pinyin.elc \
+egg.elc its/ascii.elc its/aynu.elc its/erpin.elc \
+its/hankata.elc its/hira.elc its/jeonkak.elc its/pinyin.elc \
 its/hangul.elc its/kata.elc its/quanjiao.elc \
 its/zenkaku.elc its/zhuyin.elc: its-keydef.elc
 

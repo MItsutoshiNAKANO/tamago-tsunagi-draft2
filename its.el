@@ -35,7 +35,7 @@
 (require 'egg-edep)
 
 (defgroup its nil
-  "Input Translation System of Tamagotchy"
+  "Input Translation System of Tamago 4."
   :group 'egg)
 
 (defcustom its-enable-fullwidth-alphabet t
@@ -194,8 +194,15 @@
 (defsubst its-kst-p (kst/t)
   (not (or (numberp kst/t) (null kst/t))))
 
-(defsubst its-get-output (syl/state)
-  (car syl/state))
+(defun its-get-output (syl/state &optional no-eval)
+  (setq syl/state (car syl/state))
+  (cond ((null (consp syl/state))
+	 syl/state)
+	((and (null no-eval) (eq (car syl/state) 'eval))
+	 (eval (mapcar (lambda (s) (if (stringp s) (copy-sequence s) s))
+		       (cdr syl/state))))
+	(t
+	 (copy-sequence syl/state))))
 
 (defsubst its-set-output (state output)
   (setcar state output))
@@ -274,12 +281,25 @@
     (define-key map "\M-n" 'its-next-map)
     (define-key map "\M-h" 'its-hiragana) ; hiragana-region for input-buffer
     (define-key map "\M-k" 'its-katakana)
-    (define-key map "\M-<" 'its-hankaku)
-    (define-key map "\M->" 'its-zenkaku)
+    (define-key map "\M-<" 'its-half-width)
+    (define-key map "\M->" 'its-full-width)
     map)
   "Keymap for ITS mode.")
-
 (fset 'its-mode-map its-mode-map)
+
+(defvar its-fence-mode nil)
+(make-variable-buffer-local 'its-fence-mode)
+(put 'its-fence-mode 'permanent-local t)
+
+(defvar egg-sub-mode-map-alist nil)
+(or (assq 'its-fence-mode egg-sub-mode-map-alist)
+    (setq egg-sub-mode-map-alist (cons '(its-fence-mode . its-mode-map)
+				       egg-sub-mode-map-alist)))
+
+(defun its-enter/leave-fence (&optional old new)
+  (setq its-fence-mode (its-in-fence-p)))
+
+(add-hook 'egg-enter/leave-fence-hook 'its-enter/leave-fence)
 
 (defconst its-setup-fence-before-insert-SYL nil)
 
@@ -290,17 +310,19 @@
 	     (assq t its-fence-face)))))
 
 (defun its-put-cursor (cursor)
-  (if (null (eq its-barf-on-invalid-keyseq 'its-keyseq-test))
-      (let ((p (point))
-	    (str (copy-sequence "!")))
-	(set-text-properties 0 1 (list 'local-map 'its-mode-map
-				       'read-only t
-				       'invisible t
-				       'intangible 'its-part-2
-				       'its-cursor cursor)
-			     str)
-	(insert str)
-	(goto-char p))))
+  (unless (eq its-barf-on-invalid-keyseq 'its-keyseq-test)
+    (let ((p (point))
+	  (str (copy-sequence "!")))
+      (set-text-properties 0 1 (list 'read-only          t
+				     'invisible          t
+				     'intangible         'its-part-2
+				     'its-cursor         cursor
+				     'point-entered      'egg-enter/leave-fence
+				     'point-left         'egg-enter/leave-fence
+				     'modification-hooks '(egg-modify-fence))
+			   str)
+      (insert str)
+      (goto-char p))))
 
 (defun its-set-cursor-status (cursor)
   (delete-region (point) (1+ (point)))
@@ -643,14 +665,14 @@
 	 (add-hook hook func t)
        (funcall func)
        (run-hooks hook)
-       (setq hook nil))))
+       (set hook nil))))
 
 ;; Data structure for map compaction
 ;;  <node> ::= (<count> <node#> <original node>)   ; atom
 ;;          |  (<count> <node#> (<node> . <node>)) ; cons cell
 ;;
 ;;  <count> ::= integer  ; 0 or negative - usage count
-;;                       ; psotive       - generated common sub-tree
+;;                       ; positive      - generated common sub-tree
 ;;
 ;;  <node#> ::= integer  ; subject to compaction
 ;;           |  nil      ; not subject to compaction
@@ -683,9 +705,16 @@
   `(1- (setq its-compaction-list (cons ,node its-compaction-list)
 	     its-compaction-counter-2 (1+ its-compaction-counter-2))))
 
+(defmacro its-concat (&rest args)
+  `(concat ,@(mapcar (lambda (arg)
+		       (if (stringp arg)
+			   arg
+			 `(if (numberp ,arg) (number-to-string ,arg) ,arg)))
+		     args)))
+
 (defmacro its-compaction-hash (name node parent lr type)
   (if (null type)
-      `(let ((hash (intern (concat ,@name) its-compaction-hash-table)))
+      `(let ((hash (intern (its-concat ,@name) its-compaction-hash-table)))
 	 (if (null (boundp hash))
 	     (car (set hash (list* (its-compaction-new-node) ,parent ,lr)))
 	   (setq hash (symbol-value hash))
@@ -696,7 +725,7 @@
 	   (its-compaction-set-lr ,parent ,lr (cdr hash))
 	   (car hash)))
     `(let ((hash ,(if (eq type 'integer)
-		      `(intern (concat ,@name) its-compaction-hash-table)
+		      `(intern (its-concat ,@name) its-compaction-hash-table)
 		    `(aref its-compaction-integer-table (+ ,node 10)))))
        (if (null ,(if (eq type 'integer) '(boundp hash) 'hash))
 	   (setq hash (,@(if (eq type 'integer)
@@ -708,18 +737,24 @@
        (its-compaction-set-lr ,parent ,lr (cdr hash))
        (car hash))))
 
-(defun its-map-compaction-internal (map parent lr)
+(defun its-map-compaction-internal (map parent lr &optional force)
   (cond
-   ((consp map)    (let ((candidate (or (null (stringp (car map))) (cdr map)))
-			 (l (its-map-compaction-internal (car map) map 'car))
-			 (r (its-map-compaction-internal (cdr map) map 'cdr)))
-		     (if (and candidate l r)
-			 (its-compaction-hash (l " " r) map parent lr nil))))
-   ((stringp map)  (its-compaction-hash ("STR" map) map parent lr nil))
-   ((integerp map) (if (and (>= map -10) (< map 128))
-		       (its-compaction-hash nil map parent lr small-int)
-		     (its-compaction-hash ("INT" map) map parent lr integer)))
-   ((null map)     0)))
+   ((consp map)
+    (let* ((candidate (or (null (stringp (car map))) (cdr map)))
+	   (sexp (or force (eq (car map) 'eval)))
+	   (l (its-map-compaction-internal (car map) map 'car sexp))
+	   (r (its-map-compaction-internal (cdr map) map 'cdr sexp)))
+      (if (or sexp (and candidate l r))
+	  (its-compaction-hash (l " " r) map parent lr nil))))
+   ((stringp map)
+    (its-compaction-hash ("STR" map) map parent lr nil))
+   ((integerp map)
+    (if (and (>= map -10) (< map 128))
+	(its-compaction-hash nil map parent lr small-int)
+      (its-compaction-hash ("INT" map) map parent lr integer)))
+   ((null map) 0)
+   ((symbolp map)
+    (its-compaction-hash ("SYM" (symbol-name map)) map parent lr nil))))
 
 (defvar its-map-rebuild-subtrees)
 
@@ -802,7 +837,7 @@ Return last state."
     state))
 
 (defun its-set-interim-terminal-state (state &optional output)
-  (its-make-next-state state -1 (or output (its-get-output state)))
+  (its-make-next-state state -1 (or output (its-get-output state t)))
   (its-defrule-otherwise state output))
 
 (defun its-defoutput (input display)
@@ -1124,10 +1159,14 @@ Return last state."
     (setq i 0)
     (while (< i len)
       (setq lang (get-text-property i 'egg-lang source))
-      (if (and
-	   (or (eq lang 'Chinese-GB) (eq lang 'Chinese-CNS))
-	   (setq l (egg-chinese-syllable source i)))
-	  (setq j (+ i l))
+      (if (or (and (or (eq lang 'Chinese-GB) (eq lang 'Chinese-CNS))
+		   (setq l (egg-chinese-syllable source i)))
+	      (and (setq l (get-text-property i 'composition source))
+		   (setq l (if (consp (car l)) (caar l) (cadr l)))
+		   (eq (next-single-property-change i 'composition
+						    source (length source))
+		       l)))
+	     (setq j (+ i l))
 	(setq j (+ i (egg-char-bytes (egg-string-to-char-at source i)))))
       (setq syl (substring no-prop-source i j))
       (put-text-property i j 'its-syl (cons syl syl) source)
@@ -1181,7 +1220,7 @@ Return last state."
 
 ;; TODO: handle overwrite-mode, insertion-hook, fill...
 (defun its-exit-mode-internal (&optional proceed-to-conversion n)
-  (let (start end s context)
+  (let (start end s context str)
     (its-select-previous-mode t)
     ;; Delete CURSOR
     (delete-region (point) (1+ (point)))
@@ -1198,9 +1237,10 @@ Return last state."
 	(egg-convert-region start end context n)
       ;; Remove all properties
       (goto-char start)
-      (insert (prog1
-		  (buffer-substring-no-properties start end)
-		(delete-region start end)))
+      (setq str (buffer-substring start end))
+      (egg-remove-all-text-properties 0 (length str) str)
+      (delete-region start end)
+      (insert str)
       (egg-do-auto-fill)
       (run-hooks 'input-method-after-insert-chunk-hook))))
 
@@ -1220,7 +1260,8 @@ Return last state."
       (its-kick-convert-region n))))
 
 (defun its-in-fence-p ()
-  (eq (get-text-property (point) 'intangible) 'its-part-2))
+  (and (eq (get-text-property (point) 'intangible) 'its-part-2)
+       (get-text-property (point) 'read-only)))
 
 (defvar its-translation-result "" "")
 
@@ -1241,7 +1282,7 @@ Return last state."
 (defun its-translate-region (start end)
   (interactive "r")
   (its-translate-region-internal start end)
-  (set-text-properties start (point) nil))
+  (egg-remove-all-text-properties start (point)))
 
 (defun its-translate-region-internal (start end)
   (setq its-translation-result "")
@@ -1300,66 +1341,198 @@ Return last state."
 ;;; its-hiragana : hiragana-region for input-buffer
 (defun its-hiragana ()
   (interactive)
-  (let ((inhibit-read-only t))
-    (its-input-end)
-    (its-set-part-1 (point) (its-search-end))
-    (its-convert 'japanese-hiragana (its-search-beginning) (point))
-    (its-put-cursor t)))
+  (its-convert (lambda (str lang) (japanese-hiragana str))))
 
 ;;; its-katakana : katanaka-region for input-buffer
 (defun its-katakana ()
   (interactive)
-  (let ((inhibit-read-only t))
-    (its-input-end)
-    (its-set-part-1 (point) (its-search-end))
-    (its-convert 'japanese-katakana (its-search-beginning) (point))
-    (its-put-cursor t)))
+  (its-convert (lambda (str lang) (japanese-katakana str))))
 
-;;; its-hankaku : hankaku-region for input-buffer
-(defun its-hankaku ()
+(defconst its-full-half-table (make-vector 100 nil))
+(defconst its-half-full-table (make-vector 100 nil))
+
+(let ((table '((Japanese
+		(?$B!!(B . ?\ ) (?$B!$(B . ?,)  (?$B!%(B . ?.)  (?$B!"(B . ?,)  (?$B!#(B . ?.)
+		(?$B!'(B . ?:)  (?$B!((B . ?\;) (?$B!)(B . ??)  (?$B!*(B . ?!)
+		(?$B!-(B . ?')  (?$B!.(B . ?`)  (?$B!0(B . ?^)  (?$B!2(B . ?_)  (?$B!1(B . ?~)
+		(?$B!<(B . ?-)  (?$B!=(B . ?-)  (?$B!>(B . ?-)
+		(?$B!?(B . ?/)  (?$B!@(B . ?\\) (?$B!A(B . ?~)  (?$B!C(B . ?|)
+		(?$B!F(B . ?`)  (?$B!G(B . ?')  (?$B!H(B . ?\") (?$B!I(B . ?\")
+		(?$B!J(B . ?\() (?$B!K(B . ?\)) (?$B!N(B . ?[)  (?$B!O(B . ?])
+		(?$B!P(B . ?{)  (?$B!Q(B . ?})  (?$B!R(B . ?<)  (?$B!S(B . ?>)
+		(?$B!\(B . ?+)  (?$B!](B . ?-)  (?$B!a(B . ?=)  (?$B!c(B . ?<)  (?$B!d(B . ?>)
+		(?$B!l(B . ?')  (?$B!m(B . ?\") (?$B!o(B . ?\\) (?$B!p(B . ?$)  (?$B!s(B . ?%)
+		(?$B!t(B . ?#)  (?$B!u(B . ?&)  (?$B!v(B . ?*)  (?$B!w(B . ?@)
+		(?$B#0(B . ?0)  (?$B#1(B . ?1)  (?$B#2(B . ?2)  (?$B#3(B . ?3)  (?$B#4(B . ?4)
+		(?$B#5(B . ?5)  (?$B#6(B . ?6)  (?$B#7(B . ?7)  (?$B#8(B . ?8)  (?$B#9(B . ?9)
+		(?$B#A(B . ?A)  (?$B#B(B . ?B)  (?$B#C(B . ?C)  (?$B#D(B . ?D)  (?$B#E(B . ?E)
+		(?$B#F(B . ?F)  (?$B#G(B . ?G)  (?$B#H(B . ?H)  (?$B#I(B . ?I)  (?$B#J(B . ?J)
+		(?$B#K(B . ?K)  (?$B#L(B . ?L)  (?$B#M(B . ?M)  (?$B#N(B . ?N)  (?$B#O(B . ?O)
+		(?$B#P(B . ?P)  (?$B#Q(B . ?Q)  (?$B#R(B . ?R)  (?$B#S(B . ?S)  (?$B#T(B . ?T)
+		(?$B#U(B . ?U)  (?$B#V(B . ?V)  (?$B#W(B . ?W)  (?$B#X(B . ?X)  (?$B#Y(B . ?Y)
+		(?$B#Z(B . ?Z)
+		(?$B#a(B . ?a)  (?$B#b(B . ?b)  (?$B#c(B . ?c)  (?$B#d(B . ?d)  (?$B#e(B . ?e)
+		(?$B#f(B . ?f)  (?$B#g(B . ?g)  (?$B#h(B . ?h)  (?$B#i(B . ?i)  (?$B#j(B . ?j)
+		(?$B#k(B . ?k)  (?$B#l(B . ?l)  (?$B#m(B . ?m)  (?$B#n(B . ?n)  (?$B#o(B . ?o)
+		(?$B#p(B . ?p)  (?$B#q(B . ?q)  (?$B#r(B . ?r)  (?$B#s(B . ?s)  (?$B#t(B . ?t)
+		(?$B#u(B . ?u)  (?$B#v(B . ?v)  (?$B#w(B . ?w)  (?$B#x(B . ?x)  (?$B#y(B . ?y)
+		(?$B#z(B . ?z))
+	       (Chinese-GB
+		(?$A!!(B . ?\ ) (?$A#,(B . ?,)  (?$A#.(B . ?.)  (?$A!"(B . ?,)  (?$A!#(B . ?.)
+		(?$A#:(B . ?:)  (?$A#;(B . ?\;) (?$A#?(B . ??)  (?$A#!(B . ?!)
+		(?$A#`(B . ?`)  (?$A#^(B . ?^)  (?$A#_(B . ?_)  (?$A#~(B . ?~)
+		(?$A!*(B . ?-)
+		(?$A#/(B . ?/)  (?$A#\(B . ?\\) (?$A!+(B . ?~)  (?$A#|(B . ?|)
+		(?$A!.(B . ?`)  (?$A!/(B . ?')  (?$A!0(B . ?\") (?$A!1(B . ?\")
+		(?$A#((B . ?\() (?$A#)(B . ?\)) (?$A#[(B . ?[)  ( ?$A#](B . ?])
+		(?$A#{(B . ?{)  (?$A#}(B . ?})
+		(?$A#+(B . ?+)  (?$A#-(B . ?-)  (?$A#=(B . ?=)  (?$A#<(B . ?<)  (?$A#>(B . ?>)
+		(?$A#'(B . ?')  (?$A#"(B . ?\") (?$A#$(B . ?$)  (?$A#%(B . ?%)
+		(?$A##(B . ?#)  (?$A#&(B . ?&)  (?$A#*(B . ?*)  (?$A#@(B . ?@)
+		(?$A#0(B . ?0)  (?$A#1(B . ?1)  (?$A#2(B . ?2)  (?$A#3(B . ?3)  (?$A#4(B . ?4)
+		(?$A#5(B . ?5)  (?$A#6(B . ?6)  (?$A#7(B . ?7)  (?$A#8(B . ?8)  (?$A#9(B . ?9)
+		(?$A#A(B . ?A)  (?$A#B(B . ?B)  (?$A#C(B . ?C)  (?$A#D(B . ?D)  (?$A#E(B . ?E)
+		(?$A#F(B . ?F)  (?$A#G(B . ?G)  (?$A#H(B . ?H)  (?$A#I(B . ?I)  (?$A#J(B . ?J)
+		(?$A#K(B . ?K)  (?$A#L(B . ?L)  (?$A#M(B . ?M)  (?$A#N(B . ?N)  (?$A#O(B . ?O)
+		(?$A#P(B . ?P)  (?$A#Q(B . ?Q)  (?$A#R(B . ?R)  (?$A#S(B . ?S)  (?$A#T(B . ?T)
+		(?$A#U(B . ?U)  (?$A#V(B . ?V)  (?$A#W(B . ?W)  (?$A#X(B . ?X)  (?$A#Y(B . ?Y)
+		(?$A#Z(B . ?Z)
+		(?$A#a(B . ?a)  (?$A#b(B . ?b)  (?$A#c(B . ?c)  (?$A#d(B . ?d)  (?$A#e(B . ?e)
+		(?$A#f(B . ?f)  (?$A#g(B . ?g)  (?$A#h(B . ?h)  (?$A#i(B . ?i)  (?$A#j(B . ?j)
+		(?$A#k(B . ?k)  (?$A#l(B . ?l)  (?$A#m(B . ?m)  (?$A#n(B . ?n)  (?$A#o(B . ?o)
+		(?$A#p(B . ?p)  (?$A#q(B . ?q)  (?$A#r(B . ?r)  (?$A#s(B . ?s)  (?$A#t(B . ?t)
+		(?$A#u(B . ?u)  (?$A#v(B . ?v)  (?$A#w(B . ?w)  (?$A#x(B . ?x)  (?$A#y(B . ?y)
+		(?$A#z(B . ?z))
+	       (Chinese-CNS
+		(?$(G!!(B . ?\ ) (?$(G!"(B . ?,)  (?$(G!%(B . ?.)  (?$(G!#(B . ?,)  (?$(G!$(B . ?.)
+		(?$(G!((B . ?:)  (?$(G!'(B . ?\;) (?$(G!)(B . ??)  (?$(G!*(B . ?!)
+		(?$(G!k(B . ?')  (?$(G!j(B . ?`)  (?$(G!T(B . ?^)  (?$(G"%(B . ?_)  (?$(G"#(B . ?~)
+		(?$(G"@(B . ?-)
+		(?$(G"_(B . ?/)  (?$(G"`(B . ?\\) (?$(G"a(B . ?/)  (?$(G"b(B . ?\\)
+		(?$(G"D(B . ?~)  (?$(G"^(B . ?|)
+		(?$(G!d(B . ?`)  (?$(G!e(B . ?')
+		(?$(G!h(B . ?\") (?$(G!i(B . ?\") (?$(G!f(B . ?\") (?$(G!g(B . ?\")
+		(?$(G!>(B . ?\() (?$(G!?(B . ?\))
+		(?$(G!F(B . ?[)  (?$(G!G(B . ?])  (?$(G!b(B . ?[)  (?$(G!c(B . ?])
+		(?$(G!B(B . ?{)  (?$(G!C(B . ?})  (?$(G!`(B . ?{)  (?$(G!a(B . ?})
+		(?$(G!R(B . ?<)  (?$(G!S(B . ?>)
+		(?$(G"0(B . ?+)  (?$(G"1(B . ?-)  (?$(G"8(B . ?=)  (?$(G"6(B . ?<)  (?$(G"7(B . ?>)
+		(?$(G"c(B . ?$)  (?$(G"h(B . ?%)
+		(?$(G!l(B . ?#)  (?$(G!m(B . ?&)  (?$(G!n(B . ?*)  (?$(G"i(B . ?@)
+		(?$(G$!(B . ?0)  (?$(G$"(B . ?1)  (?$(G$#(B . ?2)  (?$(G$$(B . ?3)  (?$(G$%(B . ?4)
+		(?$(G$&(B . ?5)  (?$(G$'(B . ?6)  (?$(G$((B . ?7)  (?$(G$)(B . ?8)  (?$(G$*(B . ?9)
+		(?$(G$A(B . ?A)  (?$(G$B(B . ?B)  (?$(G$C(B . ?C)  (?$(G$D(B . ?D)  (?$(G$E(B . ?E)
+		(?$(G$F(B . ?F)  (?$(G$G(B . ?G)  (?$(G$H(B . ?H)  (?$(G$I(B . ?I)  (?$(G$J(B . ?J)
+		(?$(G$K(B . ?K)  (?$(G$L(B . ?L)  (?$(G$M(B . ?M)  (?$(G$N(B . ?N)  (?$(G$O(B . ?O)
+		(?$(G$P(B . ?P)  (?$(G$Q(B . ?Q)  (?$(G$R(B . ?R)  (?$(G$S(B . ?S)  (?$(G$T(B . ?T)
+		(?$(G$U(B . ?U)  (?$(G$V(B . ?V)  (?$(G$W(B . ?W)  (?$(G$X(B . ?X)  (?$(G$Y(B . ?Y)
+		(?$(G$Z(B . ?Z)
+		(?$(G$[(B . ?a)  (?$(G$\(B . ?b)  (?$(G$](B . ?c)  (?$(G$^(B . ?d)  (?$(G$_(B . ?e)
+		(?$(G$`(B . ?f)  (?$(G$a(B . ?g)  (?$(G$b(B . ?h)  (?$(G$c(B . ?i)  (?$(G$d(B . ?j)
+		(?$(G$e(B . ?k)  (?$(G$f(B . ?l)  (?$(G$g(B . ?m)  (?$(G$h(B . ?n)  (?$(G$i(B . ?o)
+		(?$(G$j(B . ?p)  (?$(G$k(B . ?q)  (?$(G$l(B . ?r)  (?$(G$m(B . ?s)  (?$(G$n(B . ?t)
+		(?$(G$o(B . ?u)  (?$(G$p(B . ?v)  (?$(G$q(B . ?w)  (?$(G$r(B . ?x)  (?$(G$s(B . ?y)
+		(?$(G$t(B . ?z))
+	       (Korean
+		(?$(C!!(B . ?\ ) (?$(C#,(B . ?,)  (?$(C#.(B . ?.)
+		(?$(C#:(B . ?:)  (?$(C#;(B . ?\;) (?$(C#?(B . ??)  (?$(C#!(B . ?!)
+		(?$(C!/(B . ?')  (?$(C!.(B . ?`)  (?$(C#^(B . ?^)  (?$(C#_(B . ?_)  (?$(C#~(B . ?~)
+		(?$(C!*(B . ?-)  (?$(C!)(B . ?-)
+		(?$(C#/(B . ?/)  (?$(C!,(B . ?\\) (?$(C!-(B . ?~)  (?$(C#|(B . ?|)
+		(?$(C!.(B . ?`)  (?$(C!/(B . ?')  (?$(C!0(B . ?\") (?$(C!1(B . ?\")
+		(?$(C#((B . ?\() (?$(C#)(B . ?\)) (?$(C#[(B . ?[)  (?$(C#](B . ?])
+		(?$(C#{(B . ?{)  (?$(C#}(B . ?})  (?$(C!4(B . ?<)  (?$(C!5(B . ?>)
+		(?$(C#+(B . ?+)  (?$(C#-(B . ?-)  (?$(C#=(B . ?=)  (?$(C#<(B . ?<)  (?$(C#>(B . ?>)
+		(?$(C#'(B . ?')  (?$(C#"(B . ?\") (?$(C#\(B . ?\\) (?$(C#$(B . ?$)  (?$(C#%(B . ?%)
+		(?$(C##(B . ?#)  (?$(C#&(B . ?&)  (?$(C#*(B . ?*)  (?$(C#@(B . ?@)
+		(?$(C#0(B . ?0)  (?$(C#1(B . ?1)  (?$(C#2(B . ?2)  (?$(C#3(B . ?3)  (?$(C#4(B . ?4)
+		(?$(C#5(B . ?5)  (?$(C#6(B . ?6)  (?$(C#7(B . ?7)  (?$(C#8(B . ?8)  (?$(C#9(B . ?9)
+		(?$(C#A(B . ?A)  (?$(C#B(B . ?B)  (?$(C#C(B . ?C)  (?$(C#D(B . ?D)  (?$(C#E(B . ?E)
+		(?$(C#F(B . ?F)  (?$(C#G(B . ?G)  (?$(C#H(B . ?H)  (?$(C#I(B . ?I)  (?$(C#J(B . ?J)
+		(?$(C#K(B . ?K)  (?$(C#L(B . ?L)  (?$(C#M(B . ?M)  (?$(C#N(B . ?N)  (?$(C#O(B . ?O)
+		(?$(C#P(B . ?P)  (?$(C#Q(B . ?Q)  (?$(C#R(B . ?R)  (?$(C#S(B . ?S)  (?$(C#T(B . ?T)
+		(?$(C#U(B . ?U)  (?$(C#V(B . ?V)  (?$(C#W(B . ?W)  (?$(C#X(B . ?X)  (?$(C#Y(B . ?Y)
+		(?$(C#Z(B . ?Z)
+		(?$(C#a(B . ?a)  (?$(C#b(B . ?b)  (?$(C#c(B . ?c)  (?$(C#d(B . ?d)  (?$(C#e(B . ?e)
+		(?$(C#f(B . ?f)  (?$(C#g(B . ?g)  (?$(C#h(B . ?h)  (?$(C#i(B . ?i)  (?$(C#j(B . ?j)
+		(?$(C#k(B . ?k)  (?$(C#l(B . ?l)  (?$(C#m(B . ?m)  (?$(C#n(B . ?n)  (?$(C#o(B . ?o)
+		(?$(C#p(B . ?p)  (?$(C#q(B . ?q)  (?$(C#r(B . ?r)  (?$(C#s(B . ?s)  (?$(C#t(B . ?t)
+		(?$(C#u(B . ?u)  (?$(C#v(B . ?v)  (?$(C#w(B . ?w)  (?$(C#x(B . ?x)  (?$(C#y(B . ?y)
+		(?$(C#z(B . ?z))))
+      (hash (make-vector 100 nil))
+      lang pair)
+  (while table
+    (setq lang (caar table)
+	  pair (cdar table)
+	  table (cdr table))
+    (while pair
+      (set (intern (char-to-string (caar pair)) its-full-half-table)
+	   (cdar pair))
+      (set (intern (concat (symbol-name lang) (char-to-string (cdar pair)))
+		   its-half-full-table)
+	   (caar pair))
+      (setq pair (cdr pair)))
+    hash))
+
+;;; its-half-width : half-width-region for input-buffer
+(defun its-half-width ()
   (interactive)
-  (let ((inhibit-read-only t))
-    (its-input-end)
-    (its-set-part-1 (point) (its-search-end))
-    (its-convert 'its-japanese-hankaku (its-search-beginning) (point))
-    (its-put-cursor t)))
+  (its-convert
+   (lambda (str lang)
+     (concat (mapcar (lambda (c)
+		       (or (symbol-value (intern-soft (char-to-string c)
+						      its-full-half-table))
+			   c))
+		     (string-to-sequence str 'list))))))
 
-(defun its-japanese-hankaku (obj)
-  (japanese-hankaku obj 'ascii-only))
-
-;;; its-zenkaku : zenkaku-region for input-buffer
-(defun its-zenkaku ()
+;;; its-full-width : full-width-region for input-buffer
+(defun its-full-width ()
   (interactive)
-  (let ((inhibit-read-only t))
-    (its-input-end)
-    (its-set-part-1 (point) (its-search-end))
-    (its-convert 'japanese-zenkaku (its-search-beginning) (point))
-    (its-put-cursor t)))
+  (its-convert
+   (lambda (str lang)
+     (if (egg-chinese-syllable str 0)
+	 (copy-sequence str)
+       (concat (mapcar (lambda (c)
+			 (or (symbol-value
+			      (intern-soft (concat (symbol-name lang)
+						   (char-to-string c))
+					   its-half-full-table))
+			     c))
+		       (string-to-sequence str 'list)))))))
 
-(defun its-convert (func start end)
-  (let* ((goto-start (eq (point) start))
-	 (old-str (buffer-substring start end))
-	 (new-str "")
-	 (len (length old-str))
-	 (p 0)
-	 old new syl q)
-    (while (< p len)
-      (setq q (next-single-property-change p 'its-syl old-str len)
-	    old (substring old-str p q)
-	    new (copy-sequence old))
-      (set-text-properties 0 (- q p) nil new)
-      (setq new (funcall func new))
-      (if (equal new old)
-	  (setq new-str (concat new-str old))
-	(setq syl (cons (copy-sequence new) (copy-sequence new)))
-	(set-text-properties 0 (length new) (text-properties-at 0 old) new)
-	(put-text-property 0 (length new) 'its-syl syl new)
-	(setq new-str (concat new-str new)))
-      (setq p q))
-    (delete-region start end)
-    (insert new-str)
-    (if goto-start
-	(goto-char start))))
+(defun its-convert (func)
+  (let ((inhibit-read-only t))
+    (unwind-protect
+	(progn
+	  (its-input-end)
+	  (let* ((start (its-search-beginning))
+		 (end (its-search-end))
+		 (old-str (buffer-substring start end))
+		 (len (length old-str))
+		 (p 0)
+		 (new-str ""))
+	    (put-text-property 0 len 'intangible 'its-part-1 old-str)
+	    (while (< p len)
+	      (let* ((prop (text-properties-at p old-str))
+		     (cmp (memq 'composition prop))
+		     (old (its-get-output (plist-get prop 'its-syl)))
+		     (new (funcall func old (plist-get prop 'egg-lang)))
+		     (new-len (length new))
+		     syl)
+		(unless (equal new old)
+		  (when cmp
+		    (if (eq prop cmp)
+			(setq prop (cddr prop))
+		      (setcdr (nthcdr (- (length prop) (length cmp) 1) prop)
+			      (cddr cmp))))
+		  (setq syl (copy-sequence new))
+		  (plist-put prop 'its-syl (cons syl syl)))
+		(add-text-properties 0 new-len prop new)
+		(setq new-str (concat new-str new)
+		      p (+ p (length old)))))
+	    (delete-region start end)
+	    (insert new-str)))
+      (its-put-cursor t))))
 
 (defun its-mode ()
   "\\{its-mode-map}"

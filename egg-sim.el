@@ -73,7 +73,7 @@
 		result)))))
 
 (defvar egg-sim-ascii-menu
-  '(menu "ASCII:" ,(make-char-list 'ascii)))
+  `(menu "ASCII:" ,(make-char-list 'ascii)))
 
 (defvar egg-sim-latin-1-menu
   `(menu "ISO 8859-1:" ,(make-char-list 'latin-iso8859-1)))
@@ -355,7 +355,7 @@
   `(menu "Character set:" , egg-simple-input-method-menu-item-list))
 
 ;;;;###autoload
-(defun egg-simple-input-method()
+(defun egg-simple-input-method ()
   (interactive)
   (let ((result (egg-simple-input-menu)))
     (cond((stringp result)

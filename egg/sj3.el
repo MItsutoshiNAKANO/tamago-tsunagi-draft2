@@ -35,32 +35,88 @@
 (require 'egg-edep)
 
 (defgroup sj3 nil
-  "SJ3 interface for Tamago 4"
+  "SJ3 interface for Tamago 4."
   :group 'egg)
 
-(defcustom  sj3-hostname "localhost"
-  "*Hostname of SJ3 server"
+(defcustom sj3-hostname "localhost"
+  "Hostname of SJ3 server"
   :group 'sj3 :type 'string)
 
-(defcustom  sj3-server-port 3086 
-  "*Port number of SJ3 server"
+(defcustom sj3-server-port 3086
+  "Port number of SJ3 server"
   :group 'sj3 :type 'integer)
-
-(defcustom sj3-server-version 2
-  "Major version number of SJ3 server."
-  :group 'sj3
-  :type '(choice (const 1) (const 2)))
-
-(defcustom sj3-server-coding-system-list '(shift_jis euc-japan)
-  "List of coding systems for SJ3 server v1 and v2."
-  :group 'sj3
-  :type '(list (symbol :tag "v1") (symbol :tag "v2")))
 
 
 (eval-when-compile
   (defmacro SJ3-const (c)
     (cond ((eq c 'FileNotExist) 35)
 	  )))
+
+(egg-add-message
+ '((Japanese
+    (sj3-register-1 "登録辞書名:")
+    (sj3-register-2 "品詞名"))))
+
+(defvar sj3-hinshi-menu
+  '(("名詞"	.
+     (menu "品詞:名詞:"
+	   (("名詞"		. 1)
+	    ("名詞(お…)"	. 2)
+	    ("名詞(ご…)"	. 3)
+	    ("名詞(…的/化)"	. 4)
+	    ("名詞(お…する)"	. 5)
+	    ("名詞(…する)"	. 6)
+	    ("名詞(ご…する)"	. 7)
+	    ("名詞(…な/に)"	. 8)
+	    ("名詞(お…な/に)"	. 9)
+	    ("名詞(ご…な/に)"	. 10)
+	    ("名詞(副詞)"	. 11))))
+    ("代名詞"	. 12)
+    ("苗字"	. 21)
+    ("名前"	. 22)
+    ("地名"	. 24)
+    ("県/区名"	. 25)
+    ("動詞"	.
+     (menu "品詞:動詞:"
+	   (("サ変語幹"		. 80)
+	    ("ザ変語幹"		. 81)
+	    ("一段不変化部"	. 90)
+	    ("カ行五段語幹"	. 91)
+	    ("ガ行五段語幹"	. 92)
+	    ("サ行五段語幹"	. 93)
+	    ("タ行五段語幹"	. 94)
+	    ("ナ行五段語幹"	. 95)
+	    ("バ行五段語幹"	. 96)
+	    ("マ行五段語幹"	. 97)
+	    ("ラ行五段語幹"	. 98)
+	    ("ワ行五段語幹"	. 99))))
+    ("連体詞"		. 26)
+    ("接続詞"		. 27)
+    ("助数詞"		. 29)
+    ("数詞"		. 30)
+    ("接頭語"		. 31)
+    ("接尾語"		. 36)
+    ("副詞"		. 45)
+    ("副詞2"		. 46)
+    ("形容詞語幹"	. 60)
+    ("形容動詞語幹"	. 71)
+    ("単漢字"		. 189))
+  "Menu data for a hinshi (a part of speech) selection.")
+
+(defun sj3-hinshi-name (id &optional menu alist)
+  "Return a hinshi (a part of speech) name corresponding to ID.
+If ID is nil, return a flattened alist from `sj3-hinshi-menu'.
+Don't specify the optional arguments in normal use."
+  (let ((menu (or menu sj3-hinshi-menu)))
+    (if (consp menu)
+	(if (consp (cdr menu))
+	    (mapcar (lambda (elem)
+		      (setq alist (sj3-hinshi-name nil elem alist)))
+		    menu)
+	  (setq alist (nconc alist (list (cons (cdr menu) (car menu)))))))
+    (if id
+	(cdr (assq id alist))
+      alist)))
 
 (setplist 'sj3-conversion-backend
 	  '(egg-start-conversion          sj3-start-conversion
@@ -71,7 +127,8 @@
 	    egg-list-candidates           sj3-list-candidates
 	    egg-decide-candidate          sj3-decide-candidate
 	    egg-change-bunsetsu-length    sj3-change-bunsetsu-length
-	    egg-end-conversion            sj3-end-conversion))
+	    egg-end-conversion            sj3-end-conversion
+	    egg-word-registration         sj3-word-registration))
 
 (defconst sj3-backend-alist '((Japanese ((sj3-conversion-backend)))))
 
@@ -353,7 +410,7 @@ Return the list of bunsetsu."
     (list (list candidate))))
 
 (defun sj3-change-bunsetsu-length (bunsetsu prev-b next-b len major)
-  (let ((yomi (apply 'concat (mapcar 'sj3bunsetsu-get-source bunsetsu)))
+  (let ((yomi (mapconcat 'sj3bunsetsu-get-source bunsetsu nil))
 	(env (sj3bunsetsu-get-env (car bunsetsu)))
 	(old (car bunsetsu))
 	new yomi1 yomi2)
@@ -361,7 +418,7 @@ Return the list of bunsetsu."
 	  yomi2 (substring yomi len))
     (setq new (sj3rpc-tanbunsetsu-conversion env yomi1))
     ;; Only set once (memory original length of the bunsetsu).
-    (sj3bunsetsu-set-kugiri-changed new 
+    (sj3bunsetsu-set-kugiri-changed new
 				    (or (sj3bunsetsu-get-kugiri-changed old)
 					(length (sj3bunsetsu-get-source old))))
     (if (> (length yomi2) 0)
@@ -381,6 +438,37 @@ Return the list of bunsetsu."
 	(sj3rpc-close proc)
 	(setq sj3-environment nil))))
 
+;;; word registration
+
+(defun sj3-dictionary-select ()
+  (menudiag-select (list 'menu
+			 (egg-get-message 'sj3-register-1)
+			 (aref (nth 2 sj3-dictionary-specification) 0))))
+
+(defun sj3-hinshi-select ()
+  (menudiag-select (list 'menu
+			 (egg-get-message 'sj3-register-2)
+			 sj3-hinshi-menu)))
+
+(defun sj3-word-registration (backend kanji yomi)
+  "Register a word KANJI with a pronunciation YOMI."
+  (if (or (null (eq (egg-get-language 0 kanji)
+		    (sj3-get-converted-language backend)))
+	  (next-single-property-change 0 'egg-lang kanji)
+	  (null (eq (egg-get-language 0 yomi)
+		    (sj3-get-source-language backend)))
+	  (next-single-property-change 0 'egg-lang yomi))
+      (egg-error "word registration: invalid character")
+    (let* ((env (sj3-get-environment))
+	   (dic (sj3-dictionary-select))
+	   (hinshi-id (sj3-hinshi-select))
+	   (result (sj3rpc-add-word env
+				    (car (aref env 1))
+				    yomi kanji hinshi-id)))
+      (if (>= result 0)
+	  (list (sj3-hinshi-name hinshi-id) dic)
+	(egg-error (sj3rpc-get-error-message (- result)))))))
+
 ;;; setup
 
 (load "egg/sj3rpc")
@@ -388,7 +476,7 @@ Return the list of bunsetsu."
 
 ;;;###autoload
 (defun egg-activate-sj3 (&rest arg)
-  "Activate SJ3 backend of Tamagotchy."
+  "Activate SJ3 backend of Tamago 4."
   (apply 'egg-mode (append arg sj3-backend-alist)))
 
 ;;; egg/sj3.el ends here.

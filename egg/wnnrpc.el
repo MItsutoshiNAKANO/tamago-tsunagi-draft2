@@ -693,10 +693,10 @@
 
 (defmacro wnnrpc-get-result (&rest body)
   `(let (result)
-     (comm-unpack (u) result)
+     (comm-unpack (i) result)
      (if (< result 0)
        (progn
-	 (comm-unpack (u) result)
+	 (comm-unpack (i) result)
 	 (- result))
      ,@(or body '(result)))))
 
@@ -783,7 +783,7 @@ error code on faiulure."
     (comm-format (u u u) (wnn-const JS_GET_AUTOLEARNING_DIC)
 		 env-id type)
     (wnnrpc-get-result
-      (comm-unpack (u) result)
+      (comm-unpack (i) result)
       (1+ result))))
 
 (defun wnnrpc-set-autolearning-dic (env type dic-id)
@@ -798,7 +798,7 @@ Return 0 on success, negate-encoded error code on faiulure."
   "Return the version number of WNN server."
   (comm-call-with-proc proc (result)
     (comm-format (u) (wnn-const JS_VERSION))
-    (comm-unpack (u) result)
+    (comm-unpack (i) result)
     result))
 
 (defun wnnrpc-access (env path mode) 
@@ -807,7 +807,7 @@ Return 0 when the remote file (dictionary/frequency) of PATH on server
 can be accessed in mode MODE.  Return Non-zero otherwise."
   (wnnrpc-call-with-environment env (result)
     (comm-format (u u u s) (wnn-const JS_ACCESS) env-id mode path)
-    (comm-unpack (u) result)
+    (comm-unpack (i) result)
     result))
 
 (defun wnnrpc-mkdir (env path)
@@ -904,7 +904,7 @@ Return positive if loaded, zero if not, negative on failure."
 	hinshi status status-backward kangovect evaluation
 	result source fuzokugo)
     (while (> n-bunsetsu 0)
-      (comm-unpack (u u u u u u u u u u u u)
+      (comm-unpack (i i i i i i i i i i i i)
 		   end start jiritsugo-end
 		   dic-no entry freq right-now hinshi
 		   status status-backward kangovect evaluation)
@@ -929,9 +929,9 @@ Return positive if loaded, zero if not, negative on failure."
 	n-bunstsu kanji-length dlist slist
 	end start n-sho evaluation
 	n retval)
-    (comm-unpack (u u) n-bunstsu kanji-length)
+    (comm-unpack (i i) n-bunstsu kanji-length)
     (while (> n-dai 0)
-      (comm-unpack (u u u u) end start n-sho evaluation)
+      (comm-unpack (i i i i) end start n-sho evaluation)
       (setq dlist (cons (cons n-sho evaluation) dlist)
 	    n-dai (1- n-dai)))
     (setq dlist (nreverse dlist)
@@ -1010,7 +1010,7 @@ HINSHI and FUZOKUGO are information of preceding bunsetsu."
 	fi-dic dic entry offset num result)
     (comm-unpack (i) num)
     (while (> num 0)
-      (comm-unpack (u u u u) fi-dic dic entry offset)
+      (comm-unpack (i i i i) fi-dic dic entry offset)
       (setq result (cons (vector fi-dic dic entry offset -2 -4) result)
 	    num (1- num)))
     (nreverse result)))
@@ -1110,7 +1110,7 @@ HINSHI and FUZOKUGO are information of preceding bunsetsu."
   ""
   (comm-call-with-proc proc (result)
     (comm-format (u s) (wnn-const JS_ENV_EXIST) envname)
-    (comm-unpack (u) result)
+    (comm-unpack (i) result)
     result))
 
 (defun wnnrpc-make-env-sticky (env)
@@ -1156,14 +1156,14 @@ HINSHI and FUZOKUGO are information of preceding bunsetsu."
   ""
   (wnnrpc-call-with-environment env (n-dic)
     (comm-format (u u) (wnn-const JS_DIC_LIST) env-id)
-    (comm-unpack (u) n-dic)
+    (comm-unpack (i) n-dic)
     (wnnrpc-receive-dictionary-list proc n-dic)))
 
 (defun wnnrpc-get-fi-dictionary-list-with-environment (env mask)
   ""
   (wnnrpc-call-with-environment env (n-dic)
     (comm-format (u u u) (wnn-const JS_FI_DIC_LIST) env-id mask)
-    (comm-unpack (u) n-dic)
+    (comm-unpack (i) n-dic)
     (wnnrpc-receive-dictionary-list proc n-dic)))
 
 (defun wnnrpc-receive-dictionary-list (proc n-dic)
@@ -1171,7 +1171,7 @@ HINSHI and FUZOKUGO are information of preceding bunsetsu."
 	rev comment dicname freqname dic-passwd freq-passwd
 	type gosuu dic-local-flag freq-local-flag retval)
     (while (> n-dic 0)
-      (comm-unpack (u u u u u u u u S s s s s u u u u)
+      (comm-unpack (i i i i i i i i S s s s s i i i i)
 		   entry dic freq dic-mode freq-mode enable-flag nice
 		   rev comment dicname freqname dic-passwd freq-passwd
 		   type gosuu dic-local-flag freq-local-flag)
@@ -1193,7 +1193,7 @@ HINSHI and FUZOKUGO are information of preceding bunsetsu."
     (comm-format (u u i) (wnn-const JS_HINSI_DICTS) env-id -1)
     (wnnrpc-get-result
       (while (> result 0)
-	(comm-unpack (u) dic)
+	(comm-unpack (i) dic)
 	(setq dic-list (nconc dic-list (list dic))
 	      result (1- result)))
       dic-list)))
@@ -1222,7 +1222,7 @@ HINSHI and FUZOKUGO are information of preceding bunsetsu."
 				     p10 p11 p12 p13 p14 p15)
     (comm-format (u u) (wnn-const JS_PARAM_GET) env-id)
     (wnnrpc-get-result
-      (comm-unpack (u u  u u u u u  u u u u u  u u u u u)
+      (comm-unpack (i i  i i i i i  i i i i i  i i i i i)
 		   n nsho p1 p2 p3 p4 p5 p6 p7 p8 p9
 		   p10 p11 p12 p13 p14 p15)
       (vector n nsho p1 p2 p3 p4 p5 p6 p7 p8 p9 p10 p11 p12 p13 p14 p15))))
@@ -1243,7 +1243,7 @@ HINSHI and FUZOKUGO are information of preceding bunsetsu."
   ""
   (comm-call-with-proc proc (result)
     (comm-format (u s) (wnn-const JS_FILE_LOADED) path)
-    (comm-unpack (u) result)
+    (comm-unpack (i) result)
     result))
 
 (defun wnnrpc-write-file (env fid filename)
@@ -1261,9 +1261,9 @@ HINSHI and FUZOKUGO are information of preceding bunsetsu."
   (let ((i 0)
 	flist
 	nfiles fid local ref-count type name)
-    (comm-unpack (u) nfiles)
+    (comm-unpack (i) nfiles)
     (while (> nfiles 0)
-      (comm-unpack (u u u u s) fid local ref-count type name)
+      (comm-unpack (i i i i s) fid local ref-count type name)
       (setq flist (nconc flist (list (vector fid local ref-count type name)))
 	    nfiles (1- nfiles)))
     flist))
@@ -1284,7 +1284,7 @@ HINSHI and FUZOKUGO are information of preceding bunsetsu."
   "3: dictionary, 4: hindo file, 5: fuzokugo-file"
   (wnnrpc-call-with-environment env (result)
     (comm-format (u u s) (wnn-const JS_FILE_STAT) env-id path)
-    (comm-unpack (u) result)
+    (comm-unpack (i) result)
     result))
 
 (defun wnnrpc-get-file-info (env fid)
@@ -1292,7 +1292,7 @@ HINSHI and FUZOKUGO are information of preceding bunsetsu."
   (wnnrpc-call-with-environment env (name local ref-count type)
     (comm-format (u u u) (wnn-const JS_FILE_INFO) env-id fid)
     (wnnrpc-get-result
-      (comm-unpack (s u u u) name local ref-count type)
+      (comm-unpack (s i i i) name local ref-count type)
       (vector name local ref-count type))))
 
 (defmacro wnnrpc-receive-vector (n)
@@ -1300,7 +1300,7 @@ HINSHI and FUZOKUGO are information of preceding bunsetsu."
 	 (i 0)
 	 j)
      (while (< i ,n)
-       (comm-unpack (u) j)
+       (comm-unpack (i) j)
        (aset v i j)
        (setq i (1+ i)))
      v))
@@ -1311,7 +1311,7 @@ HINSHI and FUZOKUGO are information of preceding bunsetsu."
     (comm-format (u) (wnn-const JS_WHO))
     (wnnrpc-get-result
       (while (> result 0)
-	(comm-unpack (u s s) socket username hostname)
+	(comm-unpack (i s s) socket username hostname)
 	(setq who (nconc who
 			 (list (vector socket username hostname
 				       (wnnrpc-receive-vector
@@ -1324,7 +1324,7 @@ HINSHI and FUZOKUGO are information of preceding bunsetsu."
     (comm-format (u) (wnn-const JS_ENV_LIST))
     (wnnrpc-get-result
       (while (> result 0)
-	(comm-unpack (u s u u u) id name count fuzokugo dic-max)
+	(comm-unpack (i s i i i) id name count fuzokugo dic-max)
 	(setq envs (nconc envs
 			  (list (vector id name count fuzokugo dic-max
 					(wnnrpc-receive-vector
@@ -1338,7 +1338,7 @@ HINSHI and FUZOKUGO are information of preceding bunsetsu."
   ""
   (comm-call-with-proc proc (result)
     (comm-format (u) (wnn-const JS_KILL))
-    (comm-unpack (u) result)
+    (comm-unpack (i) result)
     result))
 
 (defun wnnrpc-delete-dictionary (env dic)
@@ -1357,7 +1357,7 @@ HINSHI and FUZOKUGO are information of preceding bunsetsu."
   ""
   (wnnrpc-call-with-proc proc (n-dic)
     (comm-format (u) (wnn-const JS_DIC_LIST_ALL))
-    (comm-unpack (u) n-dic)
+    (comm-unpack (i) n-dic)
     (wnnrpc-receive-dictionary-list proc n-dic)))
 
 (defun wnnrpc-delete-word (env dic entry)
@@ -1369,15 +1369,15 @@ HINSHI and FUZOKUGO are information of preceding bunsetsu."
 (defun wnnrpc-receive-word (proc yomi)
   (let (dic serial hinshi hindo right-now internal-hindo internal-right-now
 	kanji comment l l1)
-    (comm-unpack (u) dic)
+    (comm-unpack (i) dic)
     (while (>= dic 0)
-      (comm-unpack (u u u u u u) serial hinshi hindo right-now
+      (comm-unpack (i i i i i i) serial hinshi hindo right-now
 		   internal-hindo internal-right-now)
       (setq l (cons (vector dic serial hinshi hindo right-now
 			    internal-hindo internal-right-now
 			    yomi nil nil)
 		    l))
-      (comm-unpack (u) dic))
+      (comm-unpack (i) dic))
     (setq l (nreverse l)
 	  l1 l)
     (while l1
@@ -1492,7 +1492,7 @@ HINSHI and FUZOKUGO are information of preceding bunsetsu."
 		    (wnn-const WNN_FILE_STRING)))
 	(progn
 	  (goto-char (1+ (wnn-const WNN_FILE_STRING_LEN)))
-	  (comm-unpack (u v v v)
+	  (comm-unpack (i v v v)
 		       type
 		       uniq1 (wnn-const WNN_UNIQ_LEN)
 		       uniq2 (wnn-const WNN_UNIQ_LEN)
@@ -1534,10 +1534,18 @@ HINSHI and FUZOKUGO are information of preceding bunsetsu."
 
 (defun wnnrpc-make-uniq (attributes)
   (wnnrpc-with-temp-buffer
-    (comm-format (U i u V)
-		 (nth 6 attributes) (nth 11 attributes) (nth 10 attributes)
-		 wnn-system-name (wnn-const WNN_HOST_LEN))
-    (buffer-string)))
+    (let ((ctime (nth 6 attributes))
+	  (ino (nth 10 attributes))
+	  (devno (nth 11 attributes)))
+      (if (numberp devno)
+	  (comm-format (U i u V)
+		       ctime devno ino
+		       wnn-system-name (wnn-const WNN_HOST_LEN))
+	;; Emacs 21 returns returns negative devno as 16 bits uint pair
+	(comm-format (U U u V)
+		     ctime (list (car devno) (cdr devno)) ino
+		     wnn-system-name (wnn-const WNN_HOST_LEN)))
+      (buffer-string))))
 
 (defun wnnrpc-change-file-uniq (header path &optional new)
   (wnnrpc-with-write-file path
@@ -1558,27 +1566,28 @@ HINSHI and FUZOKUGO are information of preceding bunsetsu."
 (defun wnnrpc-check-passwd (proc passwd header)
   (let ((env-id -1))
     (unwind-protect
-	(if (>= (setq env-id (wnnrpc-connect proc "")) 0)
-	    (wnnrpc-call-with-environment (wnnenv-create proc env-id)
-		(file-id)
-	      (comm-format (u u v) (wnn-const JS_FILE_SEND)
-			   env-id
-			   (nth 1 header) (wnn-const WNN_UNIQ_LEN))
-	      (comm-unpack (u) file-id)
-	      (if (>= file-id 0)
-		  (progn
-		    (wnnrpc-get-result)	; ignore result code
-		    (- (wnn-const WNN_FILE_IN_USE)))
-		(wnnrpc-get-result
-		  (comm-call-with-proc-1 proc ()
-		    (comm-format (s B)
-				 (concat wnn-system-name "!TEMPFILE")
-				 (wnnrpc-make-dummy-dictionary header))
-		    (wnnrpc-get-result
-		      (let ((egg-fixed-euc (list egg-fixed-euc egg-fixed-euc)))
-			(wnnrpc-set-dictionary (wnnenv-create proc env-id)
-					       result -1 1 t t
-					       passwd "" nil))))))))
+	(if (< (setq env-id (wnnrpc-connect proc "")) 0)
+	    -1
+	  (wnnrpc-call-with-environment (wnnenv-create proc env-id)
+	      (file-id)
+	    (comm-format (u u v) (wnn-const JS_FILE_SEND)
+			 env-id
+			 (nth 1 header) (wnn-const WNN_UNIQ_LEN))
+	    (comm-unpack (i) file-id)
+	    (if (>= file-id 0)
+		(progn
+		  (wnnrpc-get-result)	; ignore result code
+		  (- (wnn-const WNN_FILE_IN_USE)))
+	      (wnnrpc-get-result
+		(comm-call-with-proc-1 proc ()
+		  (comm-format (s B)
+			       (concat wnn-system-name "!TEMPFILE")
+			       (wnnrpc-make-dummy-dictionary header))
+		  (wnnrpc-get-result
+		    (let ((egg-fixed-euc (list egg-fixed-euc egg-fixed-euc)))
+		      (wnnrpc-set-dictionary (wnnenv-create proc env-id)
+					     result -1 1 t t
+					     passwd "" nil))))))))
       (if (>= env-id 0)
 	  (wnnrpc-disconnect (wnnenv-create proc env-id))))))
 
@@ -1603,7 +1612,7 @@ HINSHI and FUZOKUGO are information of preceding bunsetsu."
       (comm-call-with-proc proc (result)
 	(comm-format (u v) (wnn-const JS_FILE_LOADED_LOCAL)
 		     (nth 1 header) (wnn-const WNN_UNIQ_LEN))
-	(comm-unpack (u) result)
+	(comm-unpack (i) result)
 	result))))
 
 (defun wnnrpc-file-receive (env fid local-filename)
@@ -1654,7 +1663,7 @@ HINSHI and FUZOKUGO are information of preceding bunsetsu."
 	    (comm-format (u u v) (wnn-const JS_FILE_SEND)
 			 env-id
 			 (nth 1 header) (wnn-const WNN_UNIQ_LEN))
-	    (comm-unpack (u) file-id)
+	    (comm-unpack (i) file-id)
 	    (if (>= file-id 0)
 		(wnnrpc-get-result
 		  (wnnenv-set-client-file env filename)
@@ -1718,9 +1727,9 @@ HINSHI and FUZOKUGO are information of preceding bunsetsu."
 (defun wnnrpc-make-temp-name (env)
   (let ((n 0)
 	(temp-form "usr/temp"))
-    (while (= (wnnrpc-access env (concat temp-form n) 0) 0)
+    (while (= (wnnrpc-access env (concat temp-form (number-to-string n)) 0) 0)
       (setq n (1+ n)))
-    (concat temp-form n)))
+    (concat temp-form (number-to-string n))))
 
 (defun wnnrpc-create-and-move-to-client (env dic-id filename type
 					     comment passwd hpasswd)

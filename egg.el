@@ -33,10 +33,11 @@
 (require 'cl)
 (require 'egg-edep)
 
-(autoload 'egg-simple-input-method "egg-sim")
+(autoload 'egg-simple-input-method "egg-sim"
+  "simple input method for Tamago 4." t)
 
 (defgroup egg nil
-  "Tamago Version 4")
+  "Tamago Version 4.")
 
 (defcustom egg-mode-preference t
   "*Make Egg as modefull input method, if non-NIL."
@@ -48,9 +49,84 @@
 (make-variable-buffer-local 'egg-last-method-name)
 (put 'egg-last-method-name 'permanent-local t)
 
-(defvar egg-current-keymap nil)
-(make-variable-buffer-local 'egg-current-keymap)
-(put 'egg-current-keymap 'permanent-local t)
+(defvar egg-mode-map-alist nil)
+(defvar egg-sub-mode-map-alist nil)
+
+(defmacro define-egg-mode-map (mode &rest initializer)
+  (let ((map (intern (concat "egg-" (symbol-name mode) "-map")))
+	(var (intern (concat "egg-" (symbol-name mode) "-mode")))
+	(comment (concat (symbol-name mode) " keymap for EGG mode.")))
+    `(progn
+       (defvar ,map (let ((map (make-sparse-keymap)))
+		      ,@initializer
+		      map)
+	 ,comment)
+       (fset ',map ,map)
+       (defvar ,var nil)
+       (make-variable-buffer-local ',var)
+       (put ',var 'permanent-local t)
+       (or (assq ',var egg-mode-map-alist)
+	   (setq egg-mode-map-alist (append egg-mode-map-alist
+					    '((,var . ,map))))))))
+
+(define-egg-mode-map modefull
+  (define-key map "\C-^" 'egg-simple-input-method)
+  (let ((i 33))
+    (while (< i 127)
+      (define-key map (vector i) 'egg-self-insert-char)
+      (setq i (1+ i)))))
+
+(define-egg-mode-map modeless
+  (define-key map " " 'mlh-space-bar-backward-henkan)
+  (define-key map "\C-^" 'egg-simple-input-method))
+
+(defvar egg-enter/leave-fence-hook nil)
+
+(defun egg-enter/leave-fence (&optional old new)
+  (run-hooks 'egg-enter/leave-fence-hook))
+
+(defvar egg-activated nil)
+(make-variable-buffer-local 'egg-activated)
+(put 'egg-activated 'permanent-local t)
+
+(defun egg-activate-keymap ()
+  (when (and egg-activated
+	     (null (eq (car egg-sub-mode-map-alist)
+		       (car minor-mode-overriding-map-alist))))
+    (let ((alist (append egg-sub-mode-map-alist egg-mode-map-alist))
+	  (overriding (copy-sequence minor-mode-overriding-map-alist)))
+      (while alist
+	(setq overriding (delq (assq (caar alist) overriding) overriding)
+	      alist (cdr alist)))
+      (setq minor-mode-overriding-map-alist (append egg-sub-mode-map-alist
+						    overriding
+						    egg-mode-map-alist)))))
+
+(add-hook 'egg-enter/leave-fence-hook 'egg-activate-keymap t)
+
+(defun egg-modify-fence (&rest arg)
+  (add-hook 'post-command-hook 'egg-post-command-func))
+
+(defun egg-post-command-func ()
+  (run-hooks 'egg-enter/leave-fence-hook)
+  (remove-hook 'post-command-hook 'egg-post-command-func))
+
+(defvar egg-change-major-mode-buffer nil)
+
+(defun egg-activate-keymap-after-command ()
+  (while egg-change-major-mode-buffer
+    (save-excursion
+      (set-buffer (car egg-change-major-mode-buffer))
+      (egg-activate-keymap)
+      (setq egg-change-major-mode-buffer (cdr egg-change-major-mode-buffer))))
+  (remove-hook 'post-command-hook 'egg-activate-keymap-after-command))
+
+(defun egg-change-major-mode-func ()
+  (setq egg-change-major-mode-buffer (cons (current-buffer)
+					   egg-change-major-mode-buffer))
+  (add-hook 'post-command-hook 'egg-activate-keymap-after-command))
+
+(add-hook 'change-major-mode-hook 'egg-change-major-mode-func)
 
 ;;;###autoload
 (defun egg-mode (&rest arg)
@@ -64,9 +140,9 @@
 	  (progn
 	    (its-exit-mode)
 	    (egg-exit-conversion))
-	(setq describe-current-input-method-function nil)
-	(if (eq (current-local-map) egg-current-keymap)
-	    (use-local-map (keymap-parent (current-local-map))))
+	(setq describe-current-input-method-function nil
+	      egg-modefull-mode nil
+	      egg-modeless-mode nil)
 	(remove-hook 'input-method-activate-hook 'its-set-mode-line-title t)
 	(force-mode-line-update))
     ;; Turn on
@@ -77,11 +153,14 @@
     (egg-set-conversion-backend (nthcdr 2 arg))
     (egg-set-conversion-backend
      (list (assq its-current-language (nthcdr 2 arg))) t)
-    (setq egg-last-method-name (car arg))
-    (setq egg-current-keymap (if egg-mode-preference
-				 (egg-modefull-map)
-			       (egg-modeless-map)))
-    (use-local-map egg-current-keymap)
+    (setq egg-last-method-name (car arg)
+	  egg-activated t)
+    (egg-activate-keymap)
+    (if egg-mode-preference
+	(progn
+	  (setq egg-modefull-mode t)
+	  (its-define-select-keys egg-modefull-map))
+      (setq egg-modeless-mode t))
     (setq inactivate-current-input-method-function 'egg-mode)
     (setq describe-current-input-method-function 'egg-help)
     (make-local-hook 'input-method-activate-hook)
@@ -95,43 +174,37 @@
   (if (<= (minibuffer-depth) 1)
       (remove-hook 'minibuffer-exit-hook 'egg-exit-from-minibuffer)))
 
-(defun egg-modefull-map ()
-  "Generate modefull keymap for EGG mode."  
-  (let ((map (make-sparse-keymap))
-	(i 33))
-    (define-key map "\C-^" 'egg-simple-input-method)
-    (while (< i 127)
-      (define-key map (vector i) 'egg-self-insert-char)
-      (setq i (1+ i)))
-    (its-define-select-keys map)
-    (set-keymap-parent map (current-local-map))
-    map))
-
-(defun egg-modeless-map ()
-  "Generate modeless keymap for EGG mode."
-  (let ((map (make-sparse-keymap)))
-    (define-key map " " 'mlh-space-bar-backward-henkan)
-    (define-key map "\C-^" 'egg-simple-input-method)
-    (set-keymap-parent map (current-local-map))
-    map))
-
 (defvar egg-context nil)
 
 (defun egg-self-insert-char ()
   (interactive)
   (its-start last-command-char (and (eq last-command 'egg-use-context)
 				    egg-context)))
+
+(defun egg-remove-all-text-properties (from to &optional object)
+  (let ((p from)
+	props prop)
+    (while (< p to)
+      (setq prop (text-properties-at p object))
+      (while prop
+	(unless (eq (car prop) 'composition)
+	  (setq props (plist-put props (car prop) nil)))
+	(setq prop (cddr prop)))
+      (setq p (next-property-change p object to)))
+    (remove-text-properties from to props object)))
 
 (defvar egg-mark-list nil)
 (defvar egg-suppress-marking nil)
 
 (defun egg-set-face (beg eng face &optional object)
-  (put face 'face face)
-  (add-text-properties beg eng
-		       (list 'category face
-			     'egg-face t
-			     'modification-hooks '(egg-mark-modification))
-		       object))
+  (let ((hook (get-text-property beg 'modification-hooks object)))
+    (put face 'face face)
+    (add-text-properties beg eng
+			 (list 'category face
+			       'egg-face t
+			       'modification-hooks (cons 'egg-mark-modification
+							 hook))
+			 object)))
 
 (defun egg-mark-modification (beg end)
   (if (and (null egg-suppress-marking)

@@ -34,18 +34,28 @@
 (require 'egg-edep)
 
 (defgroup egg-conv nil
-  "Conversion backend Interface of Tamagotchy"
+  "Conversion Backend Interface of Tamago 4."
   :group 'egg)
 
-(defcustom egg-conversion-wrap-select nil
+(defcustom egg-conversion-wrap-select t
   "*Candidate selection wraps around to first candidate, if non-NIL.
 Otherwise stop at the last candidate."
   :group 'egg-conv :type 'boolean)
 
 (defcustom egg-conversion-auto-candidate-menu 0
-  "*Automatically enter the candidate selectionmenu mode at N times
+  "*Automatically enter the candidate selection mode at N times
 next/previous-candidate, if positive number N."
   :group 'egg-conv :type 'integer)
+
+(defcustom egg-conversion-auto-candidate-menu-show-all nil
+  "*Enter show all candiate mode when automatic candidate selection
+mode, if non-NIL."
+  :group 'egg-conv :type 'boolean)
+
+(defcustom egg-conversion-sort-by-converted-string nil
+  "*Sort candidate list by converted string on candidate selection
+mode, if non-NIL."
+  :group 'egg-conv :type 'boolean)
 
 (defcustom egg-conversion-fence-invisible nil
   "*Make fence marks invisible, if non-NIL."
@@ -207,6 +217,10 @@ next/previous-candidate, if positive number N."
 (defsubst egg-bunsetsu-set-info (bunsetsu info)
   (setcdr bunsetsu info))
 
+(defun egg-conversion-fence-p ()
+  (and (egg-get-backend (point))
+       (get-text-property (point) 'read-only)))
+
 (defvar egg-finalize-backend-list nil)
 
 (defun egg-set-finalize-backend (func-list)
@@ -243,6 +257,7 @@ next/previous-candidate, if positive number N."
   (egg-major-bunsetsu-continue-p (bunsetsu))
   (egg-list-candidates (bunsetsu-list prev-b next-b major))
   (egg-decide-candidate (bunsetsu-list candidate-pos prev-b next-b))
+  (egg-special-candidate (bunsetsu-list prev-b next-b major type))
   (egg-change-bunsetsu-length (bunsetsu-list prev-b next-b length major))
   (egg-bunsetsu-combinable-p (bunsetsu next-b)) 
   (egg-end-conversion (bunsetsu-list abort))
@@ -263,7 +278,7 @@ next/previous-candidate, if positive number N."
 (defun egg-start-conversion-noconv (backend yomi-string context)
   (let ((string (copy-sequence yomi-string))
 	(language (egg-get-language 0 yomi-string)))
-    (set-text-properties 0 (length string) nil string)
+    (egg-remove-all-text-properties 0 (length string) string)
     (list (egg-bunsetsu-create backend (vector string language)))))
 
 (defun egg-get-bunsetsu-source-noconv (bunsetsu)
@@ -429,7 +444,8 @@ next/previous-candidate, if positive number N."
 	  (setq last-chinese lang))
       (setq j i
 	    i (egg-next-single-property-change i 'egg-lang str len))
-      (set-text-properties j i (list 'egg-lang lang) str))))
+      (egg-remove-all-text-properties j i str)
+      (put-text-property j i 'egg-lang lang str))))
 
 ;;; Should think again the interface to language-info-alist
 (defun egg-charset-to-language (charset)
@@ -478,7 +494,8 @@ next/previous-candidate, if positive number N."
 	    s (substring source i j)
 	    lang (egg-get-language 0 s)
 	    backend (egg-get-conversion-backend lang n t))
-      (set-text-properties 0 (- j i) (list 'egg-lang lang) s)
+      (egg-remove-all-text-properties 0 (- j i) s)
+      (put-text-property 0 (- j i) 'egg-lang lang s)
       (setq retval (nconc retval (list (list backend (list lang) s)))
 	    i j))
     (prog1
@@ -536,53 +553,72 @@ next/previous-candidate, if positive number N."
     (while (< i 127)
       (define-key map (vector i) 'egg-exit-conversion-unread-char)
       (setq i (1+ i)))
-    (define-key map "\C-@"   'egg-decide-first-char)
-    (define-key map [?\C-\ ] 'egg-decide-first-char)
-    (define-key map "\C-a"   'egg-beginning-of-conversion-buffer)
-    (define-key map "\C-b"   'egg-backward-bunsetsu)
-    (define-key map "\C-c"   'egg-abort-conversion)
-    (define-key map "\C-e"   'egg-end-of-conversion-buffer)
-    (define-key map "\C-f"   'egg-forward-bunsetsu)
-    (define-key map "\C-h"   'egg-help-command)
-    (define-key map "\C-i"   'egg-shrink-bunsetsu-major)
-    (define-key map "\C-k"   'egg-decide-before-point)
-;;    (define-key map "\C-l"   'egg-exit-conversion)  ; Don't override C-L
-    (define-key map "\C-m"   'egg-exit-conversion)
-    (define-key map "\C-n"   'egg-next-candidate-major)
-    (define-key map "\C-o"   'egg-enlarge-bunsetsu-major)
-    (define-key map "\C-p"   'egg-previous-candidate-major)
-    (define-key map "\C-r"   'egg-reconvert-bunsetsu)
-    (define-key map "\C-t"   'egg-toroku-bunsetsu)
-    (define-key map "\C-v"   'egg-inspect-bunsetsu)
-    (define-key map "\M-i"   'egg-shrink-bunsetsu-minor)
-    (define-key map "\M-n"   'egg-next-candidate-minor)
-    (define-key map "\M-o"   'egg-enlarge-bunsetsu-minor)
-    (define-key map "\M-p"   'egg-previous-candidate-minor)
-    (define-key map "\M-r"   'egg-reconvert-bunsetsu-from-source)
-    (define-key map "\M-s"   'egg-select-candidate-major)
-    (define-key map "\M-v"   'egg-toggle-inspect-mode)
-    (define-key map "\M-z"   'egg-select-candidate-minor)
-    (define-key map "\e\C-s" 'egg-select-candidate-list-all-major)
-    (define-key map "\e\C-z" 'egg-select-candidate-list-all-minor)
-    (define-key map [return] 'egg-exit-conversion)
-    (define-key map [right]  'egg-forward-bunsetsu)
-    (define-key map [left]   'egg-backward-bunsetsu)
-    (define-key map " "      'egg-next-candidate)
-    (define-key map "/"      'egg-exit-conversion)
-    ;;;(define-key map "\M-h"   'egg-hiragana)
-    ;;;(define-key map "\M-k"   'egg-katakana)
-    ;;;(define-key map "\M-<"   'egg-hankaku)
-    ;;;(define-key map "\M->"   'egg-zenkaku)
+    (define-key map "\C-@"      'egg-decide-first-char)
+    (define-key map [?\C-\ ]    'egg-decide-first-char)
+    (define-key map "\C-a"      'egg-beginning-of-conversion-buffer)
+    (define-key map "\C-b"      'egg-backward-bunsetsu)
+    (define-key map "\C-c"      'egg-abort-conversion)
+    (define-key map "\C-e"      'egg-end-of-conversion-buffer)
+    (define-key map "\C-f"      'egg-forward-bunsetsu)
+    (define-key map "\C-h"      'egg-help-command)
+    (define-key map "\C-i"      'egg-shrink-bunsetsu-major)
+    (define-key map "\C-k"      'egg-decide-before-point)
+;;    (define-key map "\C-l"      'egg-exit-conversion)  ; Don't override C-L
+    (define-key map "\C-m"      'egg-exit-conversion)
+    (define-key map "\C-n"      'egg-next-candidate-major)
+    (define-key map "\C-o"      'egg-enlarge-bunsetsu-major)
+    (define-key map "\C-p"      'egg-previous-candidate-major)
+    (define-key map "\C-r"      'egg-reconvert-bunsetsu)
+    (define-key map "\C-t"      'egg-toroku-bunsetsu)
+    (define-key map "\C-v"      'egg-inspect-bunsetsu)
+    (define-key map "\M-i"      'egg-shrink-bunsetsu-minor)
+    (define-key map "\M-n"      'egg-next-candidate-minor)
+    (define-key map "\M-o"      'egg-enlarge-bunsetsu-minor)
+    (define-key map "\M-p"      'egg-previous-candidate-minor)
+    (define-key map "\M-r"      'egg-reconvert-bunsetsu-from-source)
+    (define-key map "\M-s"      'egg-select-candidate-major)
+    (define-key map "\M-v"      'egg-toggle-inspect-mode)
+    (define-key map "\M-z"      'egg-select-candidate-minor)
+    (define-key map "\e\C-s"    'egg-select-candidate-list-all-major)
+    (define-key map "\e\C-z"    'egg-select-candidate-list-all-minor)
+    (define-key map [return]    'egg-exit-conversion)
+    (define-key map [right]     'egg-forward-bunsetsu)
+    (define-key map [left]      'egg-backward-bunsetsu)
+    (define-key map [up]        'egg-previous-candidate)
+    (define-key map [down]      'egg-next-candidate)
+    (define-key map [backspace] 'egg-abort-conversion)
+    (define-key map [clear]     'egg-abort-conversion)
+    (define-key map [delete]    'egg-abort-conversion)
+    (define-key map " "         'egg-next-candidate)
+    (define-key map "/"         'egg-exit-conversion)
+    (define-key map "\M-h"      'egg-hiragana)
+    (define-key map "\M-k"      'egg-katakana)
+    (define-key map "\M-P"      'egg-pinyin)
+    (define-key map "\M-Z"      'egg-zhuyin)
+    (define-key map "\M-H"      'egg-hangul)
     map)
   "Keymap for EGG Conversion mode.")
-
 (fset 'egg-conversion-map egg-conversion-map)
+
+(defvar egg-conversion-mode nil)
+(make-variable-buffer-local 'egg-conversion-mode)
+(put 'egg-conversion-mode 'permanent-local t)
+
+(or (assq 'egg-conversion-mode egg-sub-mode-map-alist)
+    (setq egg-sub-mode-map-alist (cons
+				  '(egg-conversion-mode . egg-conversion-map)
+				  egg-sub-mode-map-alist)))
+
+(defun egg-conversion-enter/leave-fence (&optional old new)
+  (setq egg-conversion-mode (egg-conversion-fence-p)))
+
+(add-hook 'egg-enter/leave-fence-hook 'egg-conversion-enter/leave-fence)
 
 (defun egg-exit-conversion-unread-char ()
   (interactive)
-  (setq unread-command-events (list last-command-event)
-	this-command 'egg-use-context)
-  (setq egg-context (egg-exit-conversion)))
+  (setq egg-context (egg-exit-conversion)
+        unread-command-events (list last-command-event)
+	this-command 'egg-use-context))
 
 (defun egg-make-bunsetsu (backend bunsetsu last)
   (let* ((converted (copy-sequence (egg-get-bunsetsu-converted bunsetsu)))
@@ -597,27 +633,30 @@ next/previous-candidate, if positive number N."
 				    egg-conversion-minor-separator
 				  egg-conversion-major-separator))))
     (setq len (length converted))
-    (set-text-properties 0 len
+    (egg-remove-all-text-properties 0 len converted)
+    (add-text-properties 0 len
 			 (list 'read-only          t
 			       (egg-bunsetsu-info) bunsetsu
 			       'egg-backend        backend
 			       'egg-lang           language
 			       'egg-bunsetsu-last  last
 			       'egg-major-continue continue
-			       'local-map          'egg-conversion-map)
+			       'point-entered      'egg-enter/leave-fence
+			       'point-left         'egg-enter/leave-fence
+			       'modification-hooks '(egg-modify-fence))
 			 converted)
     (if face
 	(egg-set-face 0 len1 face converted))
     converted))
 
-(defun egg-insert-bunsetsu-list (backend bunsetsu-list &optional last)
+(defun egg-insert-bunsetsu-list (backend bunsetsu-list &optional last before)
   (let ((len (length bunsetsu-list)))
-    (insert
-     (mapconcat
-      (lambda (b)
-	(setq len (1- len))
-	(egg-make-bunsetsu backend b (and (= len 0) last)))
-      bunsetsu-list ""))))
+    (funcall (if before 'insert-before-markers 'insert)
+	     (mapconcat
+	      (lambda (b)
+		(setq len (1- len))
+		(egg-make-bunsetsu backend b (and (= len 0) last)))
+	      bunsetsu-list nil))))
 
 (defun egg-beginning-of-conversion-buffer (n)
   (interactive "p")
@@ -677,8 +716,7 @@ next/previous-candidate, if positive number N."
        (egg-get-bunsetsu-info (1- p))))
 
 (defun egg-get-previous-major-bunsetsu (p)
-  (let ((p (point))
-	(prev (egg-get-previous-bunsetsu p))
+  (let ((prev (egg-get-previous-bunsetsu p))
 	bunsetsu)
     (while prev
       (setq bunsetsu (cons prev bunsetsu)
@@ -702,7 +740,10 @@ next/previous-candidate, if positive number N."
     (nreverse bunsetsu)))
 
 (defsubst egg-get-major-bunsetsu-source (list)
-  (mapconcat (lambda (b) (egg-get-bunsetsu-source b)) list ""))
+  (mapconcat 'egg-get-bunsetsu-source list nil))
+
+(defsubst egg-get-major-bunsetsu-converted (list)
+  (mapconcat 'egg-get-bunsetsu-converted list nil))
 
 (defvar egg-inspect-mode nil
   "*Display clause information on candidate selection, if non-NIL.")
@@ -724,8 +765,8 @@ next/previous-candidate, if positive number N."
 (defvar egg-candidate-selection-major t)
 (make-variable-buffer-local 'egg-candidate-selection-major)
 
-(defsubst egg-set-candsel-info (b prev-b next-b major)
-  (setq egg-candidate-selection-info (list b prev-b next-b major)))
+(defsubst egg-set-candsel-info (b major)
+  (setq egg-candidate-selection-info (list (car b) (cadr b) (caddr b) major)))
 
 (defsubst egg-candsel-last-bunsetsu () (car egg-candidate-selection-info))
 (defsubst egg-candsel-last-prev-b () (nth 1 egg-candidate-selection-info))
@@ -744,9 +785,8 @@ next/previous-candidate, if positive number N."
 
 (defun egg-get-candsel-target-major ()
   (let ((bunsetsu (egg-get-major-bunsetsu (point)))
-	next-b prev-b next)
-    (setq prev-b (egg-get-previous-major-bunsetsu (point))
-	  next (egg-next-bunsetsu-point (point) (length bunsetsu)))
+	(prev-b (egg-get-previous-major-bunsetsu (point)))
+	next-b)
     (cond
      ((and (egg-candsel-last-major)
 	   (egg-major-bunsetsu-tail-p (egg-candsel-last-prev-b) prev-b)
@@ -755,31 +795,63 @@ next/previous-candidate, if positive number N."
 				      bunsetsu))
       (setq bunsetsu (egg-candsel-last-bunsetsu)
 	    prev-b (egg-candsel-last-prev-b)
-	    next-b (egg-candsel-last-next-b))
-      (setq next (egg-next-bunsetsu-point (point) (length bunsetsu))))
-     ((null (egg-get-bunsetsu-last (1- next)))
-      (setq next-b (egg-get-major-bunsetsu next))))
+	    next-b (egg-candsel-last-next-b)))
+     ((null (egg-get-bunsetsu-last
+	     (egg-next-bunsetsu-point (point) (1- (length bunsetsu)))))
+      (setq next-b (egg-get-major-bunsetsu
+		    (egg-next-bunsetsu-point (point) (length bunsetsu))))))
     (setq egg-candidate-selection-major t)
-    (list bunsetsu prev-b next-b next t)))
+    (list bunsetsu prev-b next-b t)))
 
 (defun egg-get-candsel-target-minor ()
   (let* ((bunsetsu (list (egg-get-bunsetsu-info (point))))
 	 (prev-b (egg-get-previous-bunsetsu (point)))
 	 (next-b (egg-get-next-bunsetsu (point))))
-    (and prev-b (setq prev-b (list prev-b)))
-    (and next-b (setq next-b (list next-b)))
     (setq egg-candidate-selection-major nil)
-    (list bunsetsu prev-b next-b (egg-next-bunsetsu-point (point)) nil)))
+    (list bunsetsu (and prev-b (list prev-b)) (and next-b (list next-b)) nil)))
 
-(defun egg-insert-new-bunsetsu (b prev-b next-b next end)
-  (let ((backend (egg-get-backend (point)))
-	start last)
-    (setq start (egg-previous-bunsetsu-point (point) (length prev-b)))
-    (setq end (or end (egg-next-bunsetsu-point next (length next-b))))
-    (setq last (egg-get-bunsetsu-last (1- end)))
-    (delete-region start end)
-    (egg-insert-bunsetsu-list backend (append prev-b (append b next-b)) last)
-    (goto-char (egg-next-bunsetsu-point start (length prev-b)))
+(defun egg-check-candsel-target (b prev-b next-b major)
+  (if major
+      (and (egg-major-bunsetsu-tail-p
+	    prev-b (egg-get-previous-major-bunsetsu (point)))
+	   (let* ((cur-b (egg-get-major-bunsetsu (point)))
+		  (next-p (egg-next-bunsetsu-point (point) (length cur-b))))
+	     (egg-major-bunsetsu-head-p
+	      (append b next-b)
+	      (append cur-b (and (null (egg-get-bunsetsu-last (1- next-p)))
+				 (egg-get-major-bunsetsu next-p))))))
+    (and (eq (egg-get-bunsetsu-info (point)) (car b))
+	 (eq (egg-get-previous-bunsetsu (point)) (car prev-b))
+	 (eq (egg-get-next-bunsetsu (point)) (car next-b)))))
+
+(defun egg-insert-new-bunsetsu (b tail new-b)
+  (let* ((backend (egg-get-backend (point)))
+	 (start (egg-previous-bunsetsu-point (point) (length (cadr new-b))))
+	 (end (egg-next-bunsetsu-point (point) (+ (length b) (length tail))))
+	 (last (egg-get-bunsetsu-last (1- end)))
+	 (insert-before (buffer-has-markers-at end)))
+    (cond
+     ((buffer-has-markers-at end)
+      (delete-region start end)
+      (egg-insert-bunsetsu-list backend
+				(append (cadr new-b) (car new-b) (caddr new-b))
+				last t))
+     ((buffer-has-markers-at (egg-next-bunsetsu-point (point) (length b)))
+      (delete-region start end)
+      (egg-insert-bunsetsu-list backend (append (cadr new-b) (car new-b))
+				nil t)
+      (egg-insert-bunsetsu-list backend (caddr new-b) last))
+     ((buffer-has-markers-at (point))
+      (delete-region start end)
+      (egg-insert-bunsetsu-list backend (cadr new-b) nil t)
+      (egg-insert-bunsetsu-list backend (append (car new-b) (caddr new-b))
+				last))
+     (t
+      (delete-region start end)
+      (egg-insert-bunsetsu-list backend
+				(append (cadr new-b) (car new-b) (caddr new-b))
+				last)))
+    (goto-char (egg-next-bunsetsu-point start (length (cadr new-b))))
     (if egg-inspect-mode
 	(egg-inspect-bunsetsu t))))
 
@@ -812,16 +884,19 @@ next/previous-candidate, if positive number N."
   (apply 'egg-next-candidate-internal (- n) (egg-get-candsel-target-minor)))
 
 (defvar egg-candidate-select-counter 1)
+(make-variable-buffer-local 'egg-candidate-select-counter)
 
-(defun egg-next-candidate-internal (n b prev-b next-b next major)
+(defun egg-next-candidate-internal (n b prev-b next-b major)
   (if (eq last-command (if major 'egg-candidate-major 'egg-candidate-minor))
       (setq egg-candidate-select-counter (1+ egg-candidate-select-counter))
     (setq egg-candidate-select-counter 1))
   (if (= egg-candidate-select-counter egg-conversion-auto-candidate-menu)
-      (egg-select-candidate-internal nil b prev-b next-b next major)
+      (egg-select-candidate-internal 
+       nil egg-conversion-auto-candidate-menu-show-all
+       b prev-b next-b major)
     (setq this-command (if major 'egg-candidate-major 'egg-candidate-minor))
     (let ((inhibit-read-only t)
-	  candidates nitem i beep)
+	  new-b candidates nitem i beep)
       (setq candidates (egg-list-candidates b prev-b next-b major))
       (if (null candidates)
 	  (setq beep t)
@@ -829,21 +904,18 @@ next/previous-candidate, if positive number N."
 	      nitem (length (cdr candidates)))
 	(cond
 	 ((< i 0)			; go backward as if it is ring
-	  (while (< i 0)
-	    (setq i (+ i nitem))))
+	  (setq i (% i nitem))
+	  (if (< i 0)
+	      (setq i (+ i nitem))))
 	 ((< i nitem))			; OK
 	 (egg-conversion-wrap-select	; go backward as if it is ring
-	  (while (>= i nitem)
-	    (setq i (- i nitem))))
+	  (setq i (% i nitem)))
 	 (t				; don't go forward 
 	  (setq i (1- nitem)
 		beep t)))
-	(setq b (egg-decide-candidate b i prev-b next-b)
-	      prev-b (nth 1 b)
-	      next-b (nth 2 b)
-	      b (car b))
-	(egg-set-candsel-info b prev-b next-b major)
-	(egg-insert-new-bunsetsu b prev-b next-b next nil))
+	(setq new-b (egg-decide-candidate b i prev-b next-b))
+	(egg-set-candsel-info new-b major)
+	(egg-insert-new-bunsetsu b (caddr new-b) new-b))
       (if beep
 	  (ding)))))
 
@@ -851,39 +923,65 @@ next/previous-candidate, if positive number N."
   (let ((n -1))
     (mapcar (lambda (item) (cons item (setq n (1+ n)))) list)))
 
-(defun egg-select-candidate-major ()
-  (interactive)
-  (apply 'egg-select-candidate-internal nil (egg-get-candsel-target-major)))
+(defun egg-sort-item (list sort)
+  (if (eq (null sort) (null egg-conversion-sort-by-converted-string))
+      list
+    (sort list (lambda (a b) (string< (car a) (car b))))))
 
-(defun egg-select-candidate-minor ()
-  (interactive)
-  (apply 'egg-select-candidate-internal nil (egg-get-candsel-target-minor)))
+(defun egg-select-candidate-major (sort)
+  (interactive "P")
+  (apply 'egg-select-candidate-internal sort nil (egg-get-candsel-target-major)))
 
-(defun egg-select-candidate-list-all-major ()
-  (interactive)
-  (apply 'egg-select-candidate-internal t (egg-get-candsel-target-major)))
+(defun egg-select-candidate-minor (sort)
+  (interactive "P")
+  (apply 'egg-select-candidate-internal sort nil (egg-get-candsel-target-minor)))
 
-(defun egg-select-candidate-list-all-minor ()
-  (interactive)
-  (apply 'egg-select-candidate-internal t (egg-get-candsel-target-minor)))
+(defun egg-select-candidate-list-all-major (sort)
+  (interactive "P")
+  (apply 'egg-select-candidate-internal sort t (egg-get-candsel-target-major)))
 
-(defun egg-select-candidate-internal (all b prev-b next-b next major)
-  (let ((inhibit-read-only t)
-	(prompt (egg-get-message 'candidate))
-	candidates item-list new i)
+(defun egg-select-candidate-list-all-minor (sort)
+  (interactive "P")
+  (apply 'egg-select-candidate-internal sort t (egg-get-candsel-target-minor)))
+
+(defun egg-select-candidate-internal (sort all b prev-b next-b major)
+  (let ((prompt (egg-get-message 'candidate))
+	new-b candidates pos clist item-list i)
     (setq candidates (egg-list-candidates b prev-b next-b major))
     (if (null candidates)
 	(ding)
-      (setq all (and all '(menudiag-list-all))
-	    item-list (egg-numbering-item (cdr candidates))
+      (setq pos (car candidates)
+	    clist (cdr candidates)
+	    item-list (egg-sort-item (egg-numbering-item clist) sort)
 	    i (menudiag-select (list 'menu prompt item-list)
-			       (cons (nth (car candidates) item-list) all))
-	    new (egg-decide-candidate b i prev-b next-b)
-	    prev-b (nth 1 new)
-	    next-b (nth 2 new)
-	    new (car new))
-      (egg-set-candsel-info new prev-b next-b major)
-      (egg-insert-new-bunsetsu new prev-b next-b next nil))))
+			       all
+			       (list (assq (nth pos clist) item-list))))
+      (if (or (null (egg-conversion-fence-p))
+	      (null (egg-check-candsel-target b prev-b next-b major)))
+	  (error "Fence was already modified")
+	(let ((inhibit-read-only t))
+	  (setq new-b (egg-decide-candidate b i prev-b next-b))
+	  (egg-set-candsel-info new-b major)
+	  (egg-insert-new-bunsetsu b (caddr new-b) new-b))))))
+
+(defun egg-hiragana (&optional minor)
+  (interactive "P")
+  (if (null minor)
+      (apply 'egg-special-convert this-command (egg-get-candsel-target-major))
+    (apply 'egg-special-convert this-command (egg-get-candsel-target-minor))))
+
+(defalias 'egg-katakana 'egg-hiragana)
+(defalias 'egg-pinyin 'egg-hiragana)
+(defalias 'egg-zhuyin 'egg-hiragana)
+(defalias 'egg-hangul 'egg-hiragana)
+
+(defun egg-special-convert (type b prev-b next-b major)
+  (let ((inhibit-read-only t)
+	(new-b (egg-special-candidate b prev-b next-b major type)))
+    (if (null new-b)
+	(ding)
+      (egg-set-candsel-info new-b major)
+      (egg-insert-new-bunsetsu b (caddr new-b) new-b))))
 
 (defun egg-separate-characters (str)
   (let* ((v (egg-string-to-vector str))
@@ -915,7 +1013,7 @@ next/previous-candidate, if positive number N."
 
 (defun egg-enlarge-bunsetsu-internal (n major)
   (let ((inhibit-read-only t)
-	b prev-b next-b s1 s1len s2 s2len nchar i last next end beep)
+	b prev-b next-b new-b s1 s1len s2 s2len nchar i last end beep)
     (if major
 	(setq b (egg-get-major-bunsetsu (point))
 	      prev-b (egg-get-previous-major-bunsetsu (point)))
@@ -938,28 +1036,23 @@ next/previous-candidate, if positive number N."
      ((<= n 0)
       (setq beep t nchar (and (/= s1len 1) (egg-get-char-size 0 s1))))
      ((> n s2len)
-      (setq beep t nchar (and (/= s2len 0) (length s2))))
+      (setq beep t nchar (and (/= s2len s1len) (length s2))))
      (t
       (setq nchar 0)
       (while (> n 0)
 	(setq nchar (+ nchar (egg-get-char-size nchar s2))
 	      n (1- n)))))
-    (if nchar
-	(progn
-	  (setq next-b (nconc b next-b)
-		i (length (egg-get-bunsetsu-source (car next-b))))
-	  (while (< i nchar)
-	    (setq next-b (cdr next-b)
-		  i (+ i (length (egg-get-bunsetsu-source (car next-b))))))
-	  (setq next-b (prog1 (cdr next-b) (setcdr next-b nil))
-		next (egg-next-bunsetsu-point (point) (length b))
-		b (egg-change-bunsetsu-length b prev-b next-b nchar major))
-	  (if (null b)
-	      (setq beep t)
-	    (setq prev-b (nth 1 b)
-		  next-b (nth 2 b)
-		  b (car b))
-	    (egg-insert-new-bunsetsu b prev-b next-b next (and next-b end)))))
+    (when nchar
+      (setq next-b (nconc b next-b)
+	    i (length (egg-get-bunsetsu-source (car next-b))))
+      (while (< i nchar)
+	(setq next-b (cdr next-b)
+	      i (+ i (length (egg-get-bunsetsu-source (car next-b))))))
+      (setq next-b (prog1 (cdr next-b) (setcdr next-b nil))
+	    new-b (egg-change-bunsetsu-length b prev-b next-b nchar major))
+      (if (null new-b)
+	  (setq beep t)
+	(egg-insert-new-bunsetsu b (and (caddr new-b) next-b) new-b)))
     (if beep
 	(ding))))
 
@@ -1028,9 +1121,7 @@ next/previous-candidate, if positive number N."
       (if (or (= i len)
 	      (egg-get-bunsetsu-last (1- i) decided))
 	  (progn
-	    (apply 'insert (mapcar
-			    (lambda (b) (egg-get-bunsetsu-converted b))
-			    bunsetsu))
+	    (insert (mapconcat 'egg-get-bunsetsu-converted bunsetsu nil))
 	    (setq context (cons (cons (egg-bunsetsu-get-backend (car bunsetsu))
 				      (egg-end-conversion bunsetsu nil))
 				context)
@@ -1071,7 +1162,7 @@ next/previous-candidate, if positive number N."
 
 (defun egg-exit-conversion ()
   (interactive)
-  (if (egg-get-bunsetsu-info (point))
+  (if (egg-conversion-fence-p)
       (progn
 	(goto-char (next-single-property-change (point) 'egg-end))
 	(egg-decide-before-point))))

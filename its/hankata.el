@@ -24,10 +24,7 @@
 ;; Boston, MA 02111-1307, USA.
 
 ;;; Commentary:
-;;
-;; Symbol input is desined by jiro@math.keio.ac.jp (TANAKA Jiro)
-;; This file is based on the rules of its/kata.el in Mule-2.3 distribution.
-;;
+
 
 ;;; Code:
 

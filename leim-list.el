@@ -32,8 +32,10 @@
 ;;; Code:
 
 (when site-run-file
-  (autoload 'egg-activate-wnn "egg/wnn" "Activate Wnn backend of Tamagotchy." t)
-  (autoload 'egg-activate-sj3 "egg/sj3" "Activate SJ3 backend of Tamagotchy." t)
+  (autoload 'egg-activate-wnn "egg/wnn" "Activate Wnn backend of Tamago 4." t)
+  (autoload 'egg-activate-sj3 "egg/sj3" "Activate SJ3 backend of Tamago 4." t)
+  (autoload 'egg-activate-canna "egg/canna"
+    "Activate CANNA backend of Tamago 4." t)
 
   (register-input-method
    "japanese-egg-wnn" "Japanese" 'egg-activate-wnn
@@ -42,6 +44,11 @@
 
   (register-input-method
    "japanese-egg-sj3" "Japanese" 'egg-activate-sj3
+   "あ.."  "Romaji -> Hiragana -> Kanji&Kana"
+   'its-select-hiragana)
+
+  (register-input-method
+   "japanese-egg-canna" "Japanese" 'egg-activate-canna
    "あ.."  "Romaji -> Hiragana -> Kanji&Kana"
    'its-select-hiragana)
 
@@ -99,6 +106,9 @@
 
 (defgroup sj3 nil ""
   :group 'egg :load "egg/sj3")
+
+(defgroup canna nil ""
+  :group 'egg :load "egg/canna")
 
 (defgroup its nil "" 
   :group 'egg :load "its")

@@ -1,4 +1,4 @@
-;;; eggrc --- EGG Input Method Startup File
+;;; eggrc --- EGG Input Method Startup File -*- emacs-lisp -*-
 
 ;; Copyright (C) 1999, 2000 Free Software Foundation, Inc
 
@@ -186,11 +186,15 @@
     (wnn-add-dict '("ud")                nil             2 t   t)
     (wnn-set-param 2 5 2 45 200 80 5 1 40 0 400 -100 400 80 200 2 200))))
 
- ((eq egg-backend-type 'sj3)
-;  (sj3-set-default-sys-dic-directory "/usr/sony/dict/sj3")
-;  (sj3-set-default-usr-dic-directory "/usr/sony/dict/sj3/user/$USER")
+ ((eq egg-backend-type 'canna)
 
-  (sj3-setsysdic "sj3main.dic")
+  (canna-define-environment)
+  (canna-add-dict "iroha" nil)
+  (canna-add-dict "fuzokugo" nil)
+  (canna-add-dict "hojomwd" nil)
+  (canna-add-dict "hojoswd" nil)
+  (canna-add-dict "user" t)
 
-  (sj3-setusrdic "private.dic")
-  (sj3-setusrstdy "study.dat")))
+  (canna-define-environment "Bushu" 0 t)
+  (canna-add-dict "bushu" nil))
+ )

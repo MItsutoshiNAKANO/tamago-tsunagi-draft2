@@ -70,7 +70,7 @@
 	     ((its-in-fence-p)
 	      (its-input-end)
 	      (its-put-cursor t))
-	     ((egg-get-bunsetsu-info (point))
+	     ((egg-conversion-fence-p)
 	      (egg-exit-conversion)))
 	    (setq its-current-select-func func
 		  its-current-map ',map

@@ -36,7 +36,7 @@
 (require 'egg-edep)
 
 (defgroup wnn nil
-  "Wnn interface for Tamagotchy"
+  "Wnn interface for Tamago 4."
   :group 'egg)
 
 (defcustom wnn-auto-save-dictionaries 0
@@ -114,6 +114,7 @@ by ':' and digit N."
      egg-major-bunsetsu-continue-p wnn-major-bunsetsu-continue-p
      egg-list-candidates           wnn-list-candidates
      egg-decide-candidate          wnn-decide-candidate
+     egg-special-candidate         wnn-special-candidate
      egg-change-bunsetsu-length    wnn-change-bunsetsu-length
      egg-bunsetsu-combinable-p     wnn-bunsetsu-combinable-p
      egg-end-conversion            wnn-end-conversion
@@ -657,20 +658,28 @@ Return the list of bunsetsu."
 (defun wnn-major-bunsetsu-continue-p (bunsetsu)
   (wnn-bunsetsu-get-dai-continue bunsetsu))
 
+(defmacro wnn-uniq-hash-string (uniq-level)
+  `(mapconcat
+    (lambda (b)
+      (concat ,@(cond ((eq uniq-level 'wnn-uniq) 
+		       '((number-to-string (wnn-bunsetsu-get-hinshi b))))
+		      ((eq uniq-level 'wnn-uniq-entry)
+		       '((number-to-string (wnn-bunsetsu-get-dic-no b))
+			 "+"
+			 (number-to-string (wnn-bunsetsu-get-entry b)))))
+	      "\0"
+	      (wnn-bunsetsu-get-converted b)
+	      "\0"
+	      (wnn-bunsetsu-get-fuzokugo b)))
+    bunsetsu "\0"))
+
 (defun wnn-uniq-hash (bunsetsu hash-table)
-  (intern (mapconcat (lambda (b)
-		       (concat (cond
-				((eq wnn-uniq-level 'wnn-uniq) 
-				 (wnn-bunsetsu-get-hinshi b))
-				((eq wnn-uniq-level 'wnn-uniq-entry)
-				 (concat (wnn-bunsetsu-get-dic-no b)
-					 "+"
-					 (wnn-bunsetsu-get-entry b))))
-			       (concat "\0"
-				       (wnn-bunsetsu-get-converted b)
-				       "\0"
-				       (wnn-bunsetsu-get-fuzokugo b))))
-		     bunsetsu "\0")
+  (intern (cond ((eq wnn-uniq-level 'wnn-uniq)
+		 (wnn-uniq-hash-string wnn-uniq))
+		((eq wnn-uniq-level 'wnn-uniq-entry)
+		 (wnn-uniq-hash-string wnn-uniq-entry))
+		(t
+		 (wnn-uniq-hash-string nil)))
 	  hash-table))
 
 (defun wnn-uniq-candidates (candidates)
@@ -785,6 +794,68 @@ Return the list of bunsetsu."
     (if next-b
 	(setq next-b (list (car next-b))))
     (list cand prev-b next-b)))
+
+(defun wnn-special-candidate (bunsetsu prev-b next-b major type)
+  (let* ((backend (egg-bunsetsu-get-backend (car bunsetsu)))
+	 (lang (get backend 'language))
+	 pos cand)
+    (when (and (eq lang (get backend 'source-language))
+	       (eq lang (get backend 'converted-language)))
+      (setq pos (and (eq lang (get backend 'source-language))
+		     (eq lang (get backend 'converted-language))
+		     (cond ((eq lang 'Japanese)
+			    (cond ((eq type 'egg-hiragana) -1)
+				  ((eq type 'egg-katakana) -2)))
+			   ((or (eq lang 'Chinese-GB) (eq lang 'Chinese-CNS))
+			    (cond ((eq type 'egg-pinyin) -1)
+				  ((eq type 'egg-zhuyin) -1)))
+			   ((eq lang 'Korean)
+			    (cond ((eq type 'egg-hangul) -1))))))
+      (when pos
+	(setq cand (cdr (wnn-list-candidates bunsetsu prev-b next-b major))
+	      pos (+ pos (length cand)))
+	(when (and (or (eq lang 'Chinese-GB) (eq lang 'Chinese-CNS)))
+	  (let ((converted (nth pos cand)))
+	    (cond ((egg-pinyin-syllable converted)
+		   (cond ((eq type 'egg-pinyin)) ; OK
+			 ((eq type 'egg-zhuyin)
+			  (wnn-pinyin-zhuyin-bunsetsu bunsetsu pos lang type))
+			 (t (setq pos nil))))
+		  ((egg-zhuyin-syllable converted)
+		   (cond ((eq type 'egg-pinyin)
+			  (wnn-pinyin-zhuyin-bunsetsu bunsetsu pos lang type))
+			 ((eq type 'egg-zhuyin)) ; OK
+			 (t (setq pos nil))))
+		  (t (setq pos nil))))))
+      (when pos
+	(wnn-decide-candidate bunsetsu pos prev-b next-b)))))
+
+(defun wnn-pinyin-zhuyin-bunsetsu (bunsetsu pos lang type)
+  (let ((b (nth pos (wnn-bunsetsu-get-zenkouho-list (car bunsetsu))))
+	(encoding (if (eq lang 'Chinese-GB)
+		      (if (eq type 'egg-pinyin)
+			  'fixed-euc-py-cn 'fixed-euc-zy-cn)
+		    (if (eq type 'egg-pinyin)
+			'fixed-euc-py-tw 'fixed-euc-zy-tw)))
+	(converted (wnn-bunsetsu-get-zenkouho-converted (car bunsetsu)))
+	str)
+    (setcar (nthcdr pos converted)
+	    (wnn-pinyin-zhuyin-string (nth pos converted) encoding))
+    (while b
+      (setq str (wnn-bunsetsu-get-converted (car b)))
+      (when str
+	(wnn-bunsetsu-set-converted
+	 (car b)
+	 (wnn-pinyin-zhuyin-string str encoding)))
+      (setq str (wnn-bunsetsu-get-fuzokugo (car b)))
+      (when str
+	(wnn-bunsetsu-set-fuzokugo
+	 (car b)
+	 (wnn-pinyin-zhuyin-string str encoding)))
+      (setq b (cdr b)))))
+
+(defun wnn-pinyin-zhuyin-string (str encoding)
+  (decode-coding-string (encode-coding-string str encoding) encoding))
 
 (defun wnn-change-bunsetsu-length (bunsetsu prev-b next-b len major)
   (let ((backend (egg-bunsetsu-get-backend (car bunsetsu)))
@@ -2090,7 +2161,7 @@ environment."
 
 ;;;###autoload
 (defun egg-activate-wnn (&rest arg)
-  "Activate Wnn backend of Tamagotchy."
+  "Activate Wnn backend of Tamago 4."
   (apply 'egg-mode (append arg wnn-backend-alist)))
 
 ;;; egg/wnn.el ends here.

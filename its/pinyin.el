@@ -4,7 +4,7 @@
 
 ;; Author: KATAYAMA Yoshio <kate@pfu.co.jp>
 
-;; Maintainer: TOMURA Satoru <tomura@etl.go.jp>
+;; Maintainer: TOMURA Satoru <tomura@etl.go.jp>
 
 ;; Keywords: mule, multilingual, input method
 

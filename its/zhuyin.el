@@ -142,9 +142,9 @@
        (mapcar (lambda (s) (its-defoutput (car s) (nth 1 s)))
 	       (list B P M F D T N L G K H J Q X))
 
-       (its-defrule (concat (car N) 2) (concat (nth 1 N) "(0B(B"))
-       (its-defrule (concat (car N) 3) (concat (nth 1 N) "(0C(B"))
-       (its-defrule (concat (car N) 4) (concat (nth 1 N) "(0D(B")))))
+       (its-defrule (concat (car N) "2") (concat (nth 1 N) "(0B(B"))
+       (its-defrule (concat (car N) "3") (concat (nth 1 N) "(0C(B"))
+       (its-defrule (concat (car N) "4") (concat (nth 1 N) "(0D(B")))))
 
 (define-its-state-machine its-zhuyin-cn-map
   "zhuyin-cn" "$AW"(BG" Chinese-GB

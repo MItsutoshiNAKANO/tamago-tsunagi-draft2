@@ -50,9 +50,9 @@ TOPSRCS	= \
 	egg-edep.el \
 	egg-com.el \
 	egg-cnv.el \
-	egg-util.el \
 	egg-mlh.el \
 	egg-sim.el \
+	egg-x0213.el \
 	menudiag.el \
 	its.el \
 	its-keydef.el \
@@ -70,6 +70,7 @@ ITSSRCS	= \
 	its/aynu.el \
 	its/bixing.el \
 	its/erpin.el \
+	its/greek.el \
 	its/hankata.el \
 	its/hira.el \
 	its/jeonkak.el \
@@ -144,9 +145,7 @@ uninstall-site:
 egg/sj3rpc.elc: egg-com.elc egg/sj3.elc
 egg/wnnrpc.elc: egg-com.elc egg/wnn.elc
 
-egg.elc its/ascii.elc its/aynu.elc its/erpin.elc \
+egg.elc its/ascii.elc its/aynu.elc its/erpin.elc its/greek.elc \
 its/hankata.elc its/hira.elc its/jeonkak.elc its/pinyin.elc \
 its/hangul.elc its/kata.elc its/quanjiao.elc \
 its/zenkaku.elc its/zhuyin.elc: its-keydef.elc
-
-

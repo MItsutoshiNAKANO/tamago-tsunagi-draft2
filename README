@@ -1,0 +1,13 @@
+
+	      EGG Versio 4.0 --- Code name "Tamagotchy"
+
+		NIIBE Yutaka <gniibe@chroot.org>
+
+We've started this project with the code of EGG V3.0 in the beginning.
+However, we chose to rewrite whole of them, while referring the design
+and interface of EGG V3.0.
+
+In original version of EGG (to V3.0), it seems for me that there's no
+copyright notice.  But it has been widely distributed on the Internet
+under the licence of GPL:
+    <URL:ftp://etlport.etl.go.jp/pub/mule/mule-2.3.tar.gz>

@@ -1,0 +1,31 @@
+;;; Emacs/Egg Configuration
+
+;; <Egg>
+
+(set-language-info "Japanese"    'input-method "japanese-egg-wnn")
+
+(defvar its-hira-enable-double-n t
+  "*Enable \"nn\" input for \"ん\" ")
+
+(defvar its-hira-period "。" ;;; ". " "．"
+  "*ピリオド")
+
+(defvar its-hira-comma  "、" ;;; ", " "，"
+  "*コンマ") 
+
+(defvar its-hira-open-bracket  "「" ;;; "［"
+  "*[") 
+
+(defvar its-hira-close-bracket  "」" ;;; "］"
+  "*]") 
+
+(defvar its-hira-horizontal  "ー" ;;; "−"
+  "*-")
+
+(set-language-info "Chinese-GB"  'input-method "chinese-gb-egg-wnn-py")
+(set-language-info "Chinese-CNS" 'input-method "chinese-cns-egg-wnn-py")
+(set-language-info "Korean"      'input-method "korean-egg-wnn")
+
+(require 'egg)
+
+;; </Egg>

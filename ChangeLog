@@ -1,4 +1,53 @@
-2000-01-12  TOMURA Satoru <tomura@etl.go.jp>
+2000-01-17  TOMURA Satoru <tomura@etl.go.jp>
+
+	* Version 4.0.6 released
+	
+2000-01-17  TOMURA Satoru <tomura@etl.go.jp>
+
+	* README.ja.text: mentiond about doc/lc99.text
+	
+2000-01-17  KATAYAMA Yoshio <kate@pfu.co.jp>
+
+	* its.el (its-hiragana, its-katanaka): modified
+	(its-zenkaku, its-hankaku): added
+	(its-put-cursor): bug fixed.
+	(its-set-cursor-status): redefined.
+	(its-search-beginning, its-search-end): created.
+	(its-end-of-input-buffer): modified.
+	(its-kill-line): modified.
+	(its-cancel-input): modified.
+	(its-japanese-hankaku): added.
+	(its-convert): added.
+	* egg.el (egg-redraw-face): bug fixed.
+	
+2000-01-17  SAKAI Kiyotaka <ksakai@kso.netwk.ntt-at.co.jp>
+	
+	* its.el (its-hiragana, its-katakana): re-added.
+	
+2000-01-17  SANETO Takanori <sanewo@ba2.so-net.ne.jp>
+
+	* Makefile.in: move its-keydefs.el from ITSELS to TOPELS
+	
+2000-01-16
+	
+	* egg-sim.el: many functions renamed and modified...
+	* doc/code-table: created
+	
+2000-01-15  TOMURA Satoru <tomura@etl.go.jp>
+	
+	* egg-sim.el: rename egg-code.el as egg-sim.el
+	* egg-sim.el (egg-simple-input-method): rename
+	egg-insert-character as egg-simple-input-method
+	* egg.el: rename egg-insert-character as egg-simple-input-method
+	* doc/lc99.txt: added.
+	
+2000-01-14  TOMURA Satoru <tomura@etl.go.jp>
+	* egg-code.el: created
+	* egg.el: Bind egg-insert-character to C-^ in egg-mode
+	* egg.el: Delete the binding for C-_ in egg-mode
+	* Makefile.in: add egg-code to ${SRCS}
+	
+2000-01-13  TOMURA Satoru <tomura@etl.go.jp>
 	
 	* Version 4.0.5 released.
 

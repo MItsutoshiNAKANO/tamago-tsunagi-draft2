@@ -48,8 +48,10 @@ TOPSRCS	= \
 	egg-cnv.el \
 	egg-util.el \
 	egg-mlh.el \
+	egg-sim.el \
 	menudiag.el \
 	its.el \
+	its-keydef.el \
 
 #
 EGGSRCS	= \
@@ -72,7 +74,6 @@ ITSSRCS	= \
 	its/quanjiao.el \
 	its/zenkaku.el \
 	its/zhuyin.el \
-	its-keydef.el \
 
 #
 ELCS	= ${SRCS:.el=.elc}

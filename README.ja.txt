@@ -38,6 +38,11 @@ Tamago mailing list $B$K;22C4uK>$NJ}$O(B tamago-ctl@m17n.org $B08$K%a%$%k$N(
 $B$N#19T$rK\J8$K$7$FJV;v$rAw$C$F$/$@$5$$!#(B 
 
 
+$B;29M;qNA$H$7$FJR;3$5$s$,(B Linux Conference 99 $B$GH/I=$7$?(B Egg V4 (Egg
+Next Generation) $B$r%F%-%9%H%U%!%$%k$K$7$?$b$N$r(B doc/lc99.text $B$NCV$-$^(B
+$B$7$?!#$4Mw2<$5$$!#(B
+
+
 From Tamago 4 $B4IM}?M(B
 
 $B8MB<(B $BE/!J$H$`$i(B $B$5$H$k!K(B $B")(B305-8568 $B0q>k8)$D$/$P;TG_1`(B1-1-4 

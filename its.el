@@ -1,4 +1,4 @@
-;;; its.el --- Input Translation Systam AKA "ITS(uDekirunDa!)"
+;;; its.el --- Input Translation System AKA "ITS(uDekirunDa!)"
 
 ;; Copyright (C) 1999,2000 PFU LIMITED
 
@@ -47,7 +47,7 @@
   :group 'its :type 'boolean)
 
 (defcustom its-delete-by-keystroke nil
-  "*Delete characters as if cancele input keystroke, if nin-NIL."
+  "*Delete characters as if cancel input keystroke, if nin-NIL."
   :group 'its :type 'boolean)
 
 (defcustom its-fence-invisible nil
@@ -272,10 +272,10 @@
     ;;
     (define-key map "\M-p" 'its-previous-map)
     (define-key map "\M-n" 'its-next-map)
-    (define-key map "\M-h" 'its-hiragana) ; hiragana-region for input-buffer
-    (define-key map "\M-k" 'its-katakana)
-    (define-key map "\M-<" 'its-hankaku)
-    (define-key map "\M->" 'its-zenkaku)
+    ;;;(define-key map "\M-h" 'its-hiragana) ; hiragana-region for input-buffer
+    ;;;(define-key map "\M-k" 'its-katakana)
+    ;;;(define-key map "\M-<" 'its-hankaku)
+    ;;;(define-key map "\M->" 'its-zenkaku)
     map)
   "Keymap for ITS mode.")
 
@@ -1308,37 +1308,9 @@ Return last state."
     (setq its-stroke-input-alist
 	  (append alist its-stroke-input-alist))))
 
-(defun its-hiragana ()
-  ;; hiragana-region for input-buffer
-  (interactive)
-  (let* ((inhibit-read-only t)
-	 (start (if (get-text-property (1- (point)) 'its-start)
-		    (point)
-		  (previous-single-property-change (point) 'its-start)))
-	 (end (if (get-text-property (point) 'its-end)
-		  (point)
-		(next-single-property-change (point) 'its-end)))
-	 (old-str (buffer-substring-no-properties start (1- end)))
-	 (new-str (japanese-hiragana old-str)))
-    (delete-region start end)
-    (insert new-str)
-    (its-put-cursor t)))
+;;; its-hiragana : hiragana-region for input-buffer
 
-(defun its-katakana ()
-  ;; katakana-region for input-buffer
-  (interactive)
-  (let* ((inhibit-read-only t)
-	 (start (if (get-text-property (1- (point)) 'its-start)
-		    (point)
-		  (previous-single-property-change (point) 'its-start)))
-	 (end (if (get-text-property (point) 'its-end)
-		  (point)
-		(next-single-property-change (point) 'its-end)))
-	 (old-str (buffer-substring-no-properties start (1- end)))
-	 (new-str (japanese-katakana old-str)))
-    (delete-region start end)
-    (insert new-str)
-    (its-put-cursor t)))
+;;; its-katakana : katanaka-region for input-buffer
 
 (defun its-mode ()
   "\\{its-mode-map}"

@@ -34,7 +34,7 @@
 (require 'egg-edep)
 
 (defgroup egg nil
-  "Tamagotchy --- EGG Versio 4.0")
+  "Tamago Version 4")
 
 (defcustom egg-mode-preference t
   "*Make Egg as modefull input method, if non-NIL."

@@ -1,5 +1,47 @@
 2000-01-12  TOMURA Satoru <tomura@etl.go.jp>
 	
+	* Version 4.0.5 released.
+
+2000-01-13  Katsumi Yamaoka <yamaoka@jpl.org>
+	
+	* egg/sj3.el (sj3-end-conversion): Restrain from overrunning.
+	
+2000-01-13  Katsumi Yamaoka <yamaoka@jpl.org>
+	* egg/sj3rpc.el (sj3rpc-open): Use `sj3-server-version' instead of
+	2.
+	(sj3rpc-unpack-mb-string): New macro.
+	(sj3rpc-tanbunsetsu-conversion, sj3rpc-get-bunsetsu-candidates-sub,
+	sj3rpc-begin): Use it instead of `comm-unpack'.
+
+	(sj3rpc-server-coding-system): New macro.
+	(sj3rpc-kugiri-stdy, sj3rpc-tanbunsetsu-conversion,
+	sj3rpc-get-bunsetsu-candidates, sj3rpc-get-bunsetsu-candidates-sub,
+	sj3rpc-begin, sj3rpc-unpack-mb-string): Use it.
+
+	(sj3-const): Switch on the value of `sj3-server-version'.
+	(sj3rpc-kugiri-stdy, sj3rpc-tanbunsetsu-conversion,
+	sj3rpc-get-bunsetsu-candidates, sj3rpc-get-bunsetsu-candidates-sub,
+	sj3rpc-begin): Modify for it.
+
+	* egg/sj3.el (sj3-server-coding-system-list): New user option.
+	(sj3-server-version): Ditto.
+
+2000-01-13  SAKAI Kiyotaka <ksakai@kso.netwk.ntt-at.co.jp>
+
+	* its.el: typo
+	* egg.el: typo
+	
+2000-01-13  KATAYAMA Yoshio <kate@pfu.co.jp>
+
+	* its.el(its-hiragana, its-katakana): does not work. so deleted.
+	
+2000-01-12  NAKAJI Hiroyuki <nakaji@tutrp.tut.ac.jp>	
+
+	* README.ja.txt: typo
+	* Makefile.in: (clean, distclean): modified.
+
+2000-01-12  TOMURA Satoru <tomura@etl.go.jp>
+	
 	* Version 4.0.4 released.
 	
 2000-01-12  TOMURA Satoru <tomura@etl.go.jp>

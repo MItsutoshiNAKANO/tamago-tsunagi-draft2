@@ -1,3 +1,8 @@
+2002-07-20  SAITO Takuya <reed@lily.freemail.ne.jp>
+
+	* egg.el (egg-activate-keymap-after-command): set-buffer to
+	killed buffer.
+
 2001-05-22  KATAYAMA Yoshio <kate@pfu.fujitsu.com>
 
 	* its.el (its-delete-by-character): New customizable variable.

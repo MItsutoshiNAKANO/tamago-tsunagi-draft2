@@ -118,8 +118,9 @@
 (defun egg-activate-keymap-after-command ()
   (while egg-change-major-mode-buffer
     (save-excursion
-      (set-buffer (car egg-change-major-mode-buffer))
-      (egg-activate-keymap)
+      (when (buffer-live-p (car egg-change-major-mode-buffer))
+	(set-buffer (car egg-change-major-mode-buffer))
+	(egg-activate-keymap))
       (setq egg-change-major-mode-buffer (cdr egg-change-major-mode-buffer))))
   (remove-hook 'post-command-hook 'egg-activate-keymap-after-command))
 

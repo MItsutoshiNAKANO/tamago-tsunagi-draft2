@@ -1,5 +1,9 @@
 2002-07-20  SAITO Takuya <reed@lily.freemail.ne.jp>
 
+	* its.el (its-previous-line): point-mim -> point-min (typo)
+
+2002-07-20  SAITO Takuya <reed@lily.freemail.ne.jp>
+
 	* egg.el (egg-activate-keymap-after-command): set-buffer to
 	killed buffer.
 

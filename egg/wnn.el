@@ -557,7 +557,7 @@ by ':' and digit N."
 				 (copy-sequence (egg-bunsetsu-get-info b))))
 	  bunsetsu))
 
-(defconst wnn-server-info-list
+(defvar wnn-server-info-list
   ;; language    server  port      hostname    proc   coding-system
   '((Japanese    jserver wnn-jport wnn-jserver "Wnn"  (fixed-euc-jp    fixed-euc-jp))
     (Chinese-GB  cserver wnn-cport wnn-cserver "cWnn" (fixed-euc-py-cn fixed-euc-zy-cn))

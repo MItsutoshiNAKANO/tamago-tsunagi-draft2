@@ -1,3 +1,72 @@
+2001-12-01  ?
+
+	* egg/wnn.el (wnn-server-info-list): Use `defvar' instead of
+	`defconst' to define it.
+
+2001-12-01  KATAYAMA Yoshio  <kate@pfu.fujitsu.com>
+
+	* egg-x0213.el: New file.
+
+2001-11-10  Kinji Itoh  <kinji-i@gray.plala.or.jp>
+	(cf. http://cgi18.plala.or.jp/nyy/canna/canna-20011023-20011110.diff)
+
+	* egg/canna.el (canna-server-port): Default to the string "canna".
+	(cannna-open): Treat the port name as a string instead of a number.
+
+2001-11-08  Kinji Itoh  <kinji-i@gray.plala.or.jp> (cf. [tamago:00546])
+
+	* egg/canna.el (canna-set-converted-yomi): New function.
+	(canna-start-conversion): Use it.
+	(canna-change-bunsetsu-length): Use it.
+
+2001-10-22  Yoichi NAKAYAMA  <yoichi@eken.phys.nagoya-u.ac.jp>
+	(cf. [tamago:00534])
+
+	* egg/canna.el (canna-word-delete-regist): Signal an error using
+	`egg-error' if there is no text for yomi.
+
+2001-08-16  KATAYAMA Yoshio  <kate@pfu.fujitsu.com> (cf. [tamago:00516])
+
+	* its/greek.el: New file.
+
+2001-07-24  KATAYAMA Yoshio  <kate@pfu.fujitsu.com> (cf. [tamago:00504])
+
+	* eggrc (wnn7-jserver-setup): New function.
+
+2001-06-28  Yoshiki Hayashi  <yoshiki@xemacs.org> (cf. [tamago:00468])
+
+	* egg-cnv.el (egg-end-of-conversion-buffer): Replace
+	`next-single-property-change' to `egg-next-single-property-change'.
+	(egg-decide-before-point): Ditto.
+	(egg-exit-conversion): Ditto.
+	(egg-abort-conversion): Ditto.
+
+	* egg.el (egg-last-method-name): Default to nil.
+
+	* its-keydef.el: Set the default value of `its-select-func-alist'
+	to nil.
+
+	* its.el (its-current-language): Default to nil.
+	(its-mode-map): Use `(meta KEY)' instead of `M-KEY'.
+
+	* egg/canna.el (canna-open): Use `binary' instead of
+	`no-conversion' for the process coding-system.
+	* egg/sj3.el (sj3-open): Ditto.
+	* egg/wnn.el (wnn-open): Ditto.
+
+	* egg/wnnrpc.el (wnnrpc-with-temp-buffer): Use `binary' instead of
+	`no-conversion'.
+	(wnnrpc-with-write-file): Ditto.
+
+2001-05-24  KATAYAMA Yoshio  <kate@pfu.fujitsu.com> (cf. [tamago:00462])
+
+	* its/aynu.el: Require `cl' when compiling.
+
+2001-05-23  Katsumi Yamaoka  <yamaoka@jpl.org> (cf. [tamago:00461])
+
+	* egg.el: Require `cl' only when compiling.
+	* its.el: Ditto.
+
 2001-05-22  KATAYAMA Yoshio <kate@pfu.fujitsu.com>
 
 	* its.el (its-delete-by-character): New customizable variable.

@@ -1,3 +1,19 @@
+2000-01-12  TOMURA Satoru <tomura@etl.go.jp>
+	
+	* Version 4.0.4 released.
+	
+2000-01-12  TOMURA Satoru <tomura@etl.go.jp>
+
+	* REAMDE: removed.
+	
+	* README.ja.txt: created.
+	
+2000-01-12  SAKAI Kiyotaka <ksakai@kso.netwk.ntt-at.co.jp>
+
+	* Makefile.in: "clean" removes ${ELCS}.
+	
+	* Makefile.in: "distclean" created.
+	
 2000-01-12  Satoru Tomura  <tomura@etl.go.jp>
 
 	* Version 4.0.3 released.
@@ -23,12 +39,15 @@
 	* egg/sj3.el : (require 'egg) added.
 
 2000-01-11  SAKAI Kiyotaka <ksakai@kso.netwk.ntt-at.co.jp>
+	
 	* its.el (its-hiragana, its-katakana): New functions
 	
 2000-01-07  Tomura Satoru   <tomura@etl.go.jp>
 	
 	* COPYING: The file is added.
+	
 	* ChangeLog.1: The original ChangeLog is renamed as.
+	
 	* ChangeLog: Created.
 	
 2000-01-07  Tomura Satoru   <tomura@etl.go.jp>

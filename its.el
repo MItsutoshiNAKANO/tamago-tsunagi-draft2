@@ -1572,7 +1572,7 @@ otherwise run `next-line' as usual."
   "Go to the beginning of the line if it is called in the first line of a
 buffer, otherwise run `previous-line' as usual."
   (interactive "p")
-  (if (= (line-beginning-position) (point-mim))
+  (if (= (line-beginning-position) (point-min))
       (beginning-of-line)
     (previous-line arg)))
 

@@ -148,10 +148,10 @@ INPUT + I-TAIL + OTHERWISE  (see `its-defrule-otherwise')."
     (its-defrule (concat "x" (car small)) (cadr small)))
 
   (its-define-aynu
-   (""   nil   	"ア"   "イ"   "ウ"   "エ"   "オ")
-   ("k"  "ㇰ"  	"カ"   "キ"   "ク"   "ケ"   "コ")
+   (""   nil	"ア"   "イ"   "ウ"   "エ"   "オ")
+   ("k"  "ㇰ"		"カ"   "キ"   "ク"   "ケ"   "コ")
    ("g"  "グ"   "ガ"   "ギ"   "グ"   "ゲ"   "ゴ")
-   ("s"  "ㇲ"  	"サ"   "シ"   "ス"   "セ"   "ソ")
+   ("s"  "ㇲ"		"サ"   "シ"   "ス"   "セ"   "ソ")
    ("z"  nil    "ザ"   "ジ"   "ズ"   "ゼ"   "ゾ")
    ("vs" nil    nil    nil    nil    "セ゚"   nil)
    ("sh" "シャ" "シャ" "シ"   "シュ" "シェ" "ショ")
@@ -281,4 +281,5 @@ INPUT + I-TAIL + OTHERWISE  (see `its-defrule-otherwise')."
       (its-defrule   "?"   "?")  (its-defrule   "/"   "/"))))
 
 (provide 'its/aynu)
-;;; its/aynu.el ends here.
+
+;;; its/aynu.el ends here

@@ -30,6 +30,9 @@
 
 ;;; Code:
 
+(defconst egg-version "4.0.6"
+  "Version number for this version of Tamago.")
+
 (eval-when-compile
   (require 'cl))
 
@@ -47,7 +50,7 @@
 
 (defvar egg-default-language)
 
-(defvar egg-last-method-name)
+(defvar egg-last-method-name nil)
 (make-variable-buffer-local 'egg-last-method-name)
 (put 'egg-last-method-name 'permanent-local t)
 
@@ -345,7 +348,7 @@
 	(funcall auto-fill-function)
 	(while (and (< fill-column (current-column))
 		    (< (current-column) ocolumn))
-  	  (setq ocolumn (current-column))
+	  (setq ocolumn (current-column))
 	  (funcall auto-fill-function)))))
 
 (eval-when (eval load)

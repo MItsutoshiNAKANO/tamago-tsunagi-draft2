@@ -157,7 +157,7 @@ mode, if non-NIL."
 	    pair (assq lang egg-conversion-backend-alist))
       (cond
        ((null pair)
-	(setq egg-conversion-backend-alist 
+	(setq egg-conversion-backend-alist
 	      (cons (cons lang backend-set) egg-conversion-backend-alist)))
        (force
 	(setcdr pair backend-set))))))
@@ -259,7 +259,7 @@ mode, if non-NIL."
   (egg-decide-candidate (bunsetsu-list candidate-pos prev-b next-b))
   (egg-special-candidate (bunsetsu-list prev-b next-b major type))
   (egg-change-bunsetsu-length (bunsetsu-list prev-b next-b length major))
-  (egg-bunsetsu-combinable-p (bunsetsu next-b)) 
+  (egg-bunsetsu-combinable-p (bunsetsu next-b))
   (egg-end-conversion (bunsetsu-list abort))
   (egg-word-inspection (bunsetsu))
   (egg-word-registration (backend source converted))))
@@ -517,7 +517,7 @@ mode, if non-NIL."
 	      file (and (file-readable-p file) file))
       (while (and (null file) path)
 	(if (stringp (car path))
-	    (setq file (substitute-in-file-name 
+	    (setq file (substitute-in-file-name
 			(expand-file-name filename (car path)))
 		  file (and (file-exists-p file) file)))
 	(setq path (cdr path)))
@@ -667,13 +667,13 @@ mode, if non-NIL."
    ((null (get-text-property (1- (point)) 'egg-start))
     (goto-char (previous-single-property-change (point) 'egg-start)))))
 
-(defun egg-end-of-conversion-buffer(n)
+(defun egg-end-of-conversion-buffer (n)
   (interactive "p")
   (cond
    ((<= n 0)
     (egg-beginning-of-conversion-buffer 1))
    (t
-    (goto-char (next-single-property-change (point) 'egg-end))
+    (goto-char (egg-next-single-property-change (point) 'egg-end))
     (backward-char))))
 
 (defun egg-backward-bunsetsu (n)
@@ -892,7 +892,7 @@ mode, if non-NIL."
       (setq egg-candidate-select-counter (1+ egg-candidate-select-counter))
     (setq egg-candidate-select-counter 1))
   (if (= egg-candidate-select-counter egg-conversion-auto-candidate-menu)
-      (egg-select-candidate-internal 
+      (egg-select-candidate-internal
        nil egg-conversion-auto-candidate-menu-show-all
        b prev-b next-b major)
     (setq this-command (if major 'egg-candidate-major 'egg-candidate-minor))
@@ -911,7 +911,7 @@ mode, if non-NIL."
 	 ((< i nitem))			; OK
 	 (egg-conversion-wrap-select	; go backward as if it is ring
 	  (setq i (% i nitem)))
-	 (t				; don't go forward 
+	 (t				; don't go forward
 	  (setq i (1- nitem)
 		beep t)))
 	(setq new-b (egg-decide-candidate b i prev-b next-b))
@@ -1107,13 +1107,13 @@ mode, if non-NIL."
 		  (previous-single-property-change (point) 'egg-start)))
 	 (end (if (get-text-property (point) 'egg-end)
 		  (point)
-		(next-single-property-change (point) 'egg-end)))
+		(egg-next-single-property-change (point) 'egg-end)))
 	 (decided (buffer-substring start (point)))
 	 (undecided (buffer-substring (point) end))
 	 i len bunsetsu source context)
     (delete-region
      (previous-single-property-change start 'egg-start nil (point-min))
-     (next-single-property-change end 'egg-end nil (point-max)))
+     (egg-next-single-property-change end 'egg-end nil (point-max)))
     (setq i 0
 	  len (length decided))
     (while (< i len)
@@ -1153,11 +1153,11 @@ mode, if non-NIL."
 		  (previous-single-property-change (point) 'egg-start)))
 	 (end (if (get-text-property (point) 'egg-end)
 		  (point)
-		(next-single-property-change (point) 'egg-end)))
+		(egg-next-single-property-change (point) 'egg-end)))
 	 (bunsetsu (egg-get-bunsetsu-info start)))
     (delete-region
      (previous-single-property-change start 'egg-start nil (point-min))
-     (next-single-property-change end 'egg-end nil (point-max)))
+     (egg-next-single-property-change end 'egg-end nil (point-max)))
     (egg-end-conversion (list bunsetsu) nil)
     (insert (egg-string-to-char-at (egg-get-bunsetsu-converted bunsetsu) 0))))
 
@@ -1165,7 +1165,7 @@ mode, if non-NIL."
   (interactive)
   (if (egg-conversion-fence-p)
       (progn
-	(goto-char (next-single-property-change (point) 'egg-end))
+	(goto-char (egg-next-single-property-change (point) 'egg-end))
 	(egg-decide-before-point))))
 
 (defun egg-abort-conversion ()
@@ -1179,8 +1179,8 @@ mode, if non-NIL."
 		'egg-start nil (point-min)))
     (setq source (get-text-property (point) 'egg-source)
 	  context (get-text-property (point) 'egg-context))
-    (delete-region (point) (next-single-property-change
-			    (next-single-property-change (point) 'egg-end)
+    (delete-region (point) (egg-next-single-property-change
+			    (egg-next-single-property-change (point) 'egg-end)
 			    'egg-end nil (point-max)))
     (its-restart source nil nil context)))
 
@@ -1248,4 +1248,5 @@ mode, if non-NIL."
     (help-setup-xref (cons #'help-xref-mode (current-buffer)) (interactive-p))))
 
 (provide 'egg-cnv)
-;;; egg-cnv.el ends here.
+
+;;; egg-cnv.el ends here

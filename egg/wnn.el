@@ -390,13 +390,12 @@ by ':' and digit N."
 
 ;; <wnn-bunsetsu> ::= [ <env>
 ;;                      <jirilen> <dic-no> <entry> <freq> <right-now> <hinshi>
-;;                     	<status> <status-backward> <kangovect> <evaluation>
-;;                     	<converted> <yomi> <fuzokugo>
-;;                     	<dai-evaluation> <dai-continue> <change-top>
-;;                     	<zenkouho-info> <freq-down> <fi-rel> <context> ]
+;;                      <status> <status-backward> <kangovect> <evaluation>
+;;                      <converted> <yomi> <fuzokugo>
+;;                      <dai-evaluation> <dai-continue> <change-top>
+;;                      <zenkouho-info> <freq-down> <fi-rel> <context> ]
 ;;
 ;; <zenkouho-info> ::= [ <pos> <list> <converted> <dai> <prev-b> <nxet-b> ]
-;;                    
 
 (defsubst wnn-bunsetsu-create (env jirilen dic-no entry freq right-now hinshi
 			       status status-backward kangovect evaluation)
@@ -661,7 +660,7 @@ Return the list of bunsetsu."
 (defmacro wnn-uniq-hash-string (uniq-level)
   `(mapconcat
     (lambda (b)
-      (concat ,@(cond ((eq uniq-level 'wnn-uniq) 
+      (concat ,@(cond ((eq uniq-level 'wnn-uniq)
 		       '((number-to-string (wnn-bunsetsu-get-hinshi b))))
 		      ((eq uniq-level 'wnn-uniq-entry)
 		       '((number-to-string (wnn-bunsetsu-get-dic-no b))
@@ -989,7 +988,7 @@ Return the list of bunsetsu."
 					      (wnn-bunsetsu-get-right-now b)
 					      (wnn-bunsetsu-get-freq b))
 			  context))
-      (wnnrpc-set-frequency env dic-no entry 
+      (wnnrpc-set-frequency env dic-no entry
 			    (WNN-const IMA_ON) (WNN-const HINDO_INC)))
     (list (car context) (nth 1 context))))
 
@@ -1210,7 +1209,7 @@ Return the list of bunsetsu."
 	(proc-name (wnn-server-proc-name server-info))
 	(msg-form "Wnn: connecting to %S at %s...")
 	(user-name (user-login-name))
- 	buf hostname myname port-off proc result msg)
+	buf hostname myname port-off proc result msg)
     (unwind-protect
 	(progn
 	  (setq buf (generate-new-buffer (wnn-server-buffer-name server-info)))
@@ -1246,7 +1245,7 @@ Return the list of bunsetsu."
 		((error quit))))
 	    (when proc
 	      (process-kill-without-query proc)
-	      (set-process-coding-system proc 'no-conversion 'no-conversion)
+	      (set-process-coding-system proc 'binary 'binary)
 	      (set-process-sentinel proc 'wnn-comm-sentinel)
 	      (set-marker-insertion-type (process-mark proc) t)
 	      (setq result (wnnrpc-open proc myname user-name))
@@ -1347,7 +1346,7 @@ is non-NIL."
   (setq env-name (if reverse (concat env-name "R") env-name)
 	wnn-current-envspec (wnn-envspec-create env-name tankan stickey)
 	wnn-current-envspec-reverse reverse
-	wnn-envspec-list (nconc wnn-envspec-list 
+	wnn-envspec-list (nconc wnn-envspec-list
 				(list wnn-current-envspec))))
 
 (defun wnn-set-fuzokugo (filename)
@@ -1430,7 +1429,7 @@ is non-NIL."
 			       dict freq nil dict-rw freq-rw
 			       dict-passwd freq-passwd nil))
 
-(defun wnn-add-notrans-dict (dict priority dict-rw 
+(defun wnn-add-notrans-dict (dict priority dict-rw
 			     &optional dict-passwd &rest reverse)
   (wnn-wnn6-env-func wnn-add-notrans-dict)
   (wnn-add-dict-param-check wnn-add-notrans-dict
@@ -1776,7 +1775,7 @@ On failure, return negative error code."
 	     (wnn-create-frequency env fi did fname "" fpass))
 	(message (egg-get-message 'wnn-re-create-freq) fname)
 	(and (>= (setq fid (wnn-open-file env fname)) 0)
-	     (>= (wnnrpc-set-dictionary env 
+	     (>= (wnnrpc-set-dictionary env
 					did fid prior drw frw
 					dpass fpass rev)
 		 0))))))))

@@ -162,8 +162,8 @@
 	  ((eq c 'WNN_NOT_A_FILE)          98)
 	  ((eq c 'WNN_INODE_CHECK_ERROR)   99)
 
-	  ((eq c 'WNN_UD_DICT)        	    2)
-	  ((eq c 'WNN_REV_DICT)       	    3)
+	  ((eq c 'WNN_UD_DICT)              2)
+	  ((eq c 'WNN_REV_DICT)             3)
 	  ((eq c 'CWNN_REV_DICT)       ?\x103)
 	  ((eq c 'BWNN_REV_DICT)       ?\x203)
 	  ((eq c 'WNN_COMPACT_DICT)         5)
@@ -725,7 +725,7 @@
 
 (defun wnnrpc-connect (proc envname)
   "Establish new `connection' and make an environment.
-Return the identitifation of the environment on success, 
+Return the identitifation of the environment on success,
 or negative error code on failure."
   (comm-call-with-proc proc ()
     (comm-format (u s) (wnn-const JS_CONNECT) envname)
@@ -739,7 +739,7 @@ Return non-negative file ID on success, or negative error code on failure."
     (wnnrpc-get-result)))
 
 (defun wnnrpc-set-fuzokugo-file (env fid)
-  "For PROC, on environment ENV-ID, 
+  "For PROC, on environment ENV-ID,
 Set Fuzokugo file specified by FID.
 Return 0 on success, negate-encoded error code on failure."
   (wnnrpc-call-with-environment env ()
@@ -801,7 +801,7 @@ Return 0 on success, negate-encoded error code on faiulure."
     (comm-unpack (i) result)
     result))
 
-(defun wnnrpc-access (env path mode) 
+(defun wnnrpc-access (env path mode)
   "Check the accessibility of file in the environment ENV.
 Return 0 when the remote file (dictionary/frequency) of PATH on server
 can be accessed in mode MODE.  Return Non-zero otherwise."
@@ -1454,16 +1454,16 @@ HINSHI and FUZOKUGO are information of preceding bunsetsu."
 
 (defmacro wnnrpc-with-temp-buffer (&rest body)
   `(with-temp-buffer
-     (let ((coding-system-for-read 'no-conversion)
-	   (coding-system-for-write 'no-conversion))
+     (let ((coding-system-for-read 'binary)
+	   (coding-system-for-write 'binary))
        (set-buffer-multibyte nil)
        ,@body)))
 
 (defmacro wnnrpc-with-write-file (filename error-handler &rest body)
   `(condition-case error
        (with-temp-file ,filename
-	 (let ((coding-system-for-read 'no-conversion)
-	       (coding-system-for-write 'no-conversion))
+	 (let ((coding-system-for-read 'binary)
+	       (coding-system-for-write 'binary))
 	   (set-buffer-multibyte nil)
 	   ,@body))
      (file-error ,error-handler)))
@@ -1511,7 +1511,7 @@ HINSHI and FUZOKUGO are information of preceding bunsetsu."
     (cond ((null header)
 	   (- (wnn-const WNN_NOT_A_FILE)))
 	  ((null (car header))
-	   (if (file-exists-p path) 
+	   (if (file-exists-p path)
 	       (- (wnn-const WNN_OPENF_ERR))
 	     (- (wnn-const WNN_NO_EXIST))))
 	  (t
@@ -1638,7 +1638,7 @@ HINSHI and FUZOKUGO are information of preceding bunsetsu."
 		(wnnrpc-terminate-current-command WNN_FILE_WRITE_ERROR))
 	       (t
 		(wnnrpc-with-write-file local-filename
-		    (- (wnn-const WNN_FILE_WRITE_ERROR))	    
+		    (- (wnn-const WNN_FILE_WRITE_ERROR))
 		  (comm-call-with-proc proc ()
 		    (comm-format (u) (wnn-const WNN_ACK))
 		    (comm-unpack (B) contents))
@@ -1714,7 +1714,7 @@ HINSHI and FUZOKUGO are information of preceding bunsetsu."
 					     comment passwd hpasswd))
       0
     (- (wnn-const WNN_FILE_CREATE_ERROR))))
-	  
+
 
 (defun wnnrpc-hindo-file-create-client (env fi dic-id freqname comment passwd)
   (if (and (null (file-exists-p freqname))
@@ -1759,7 +1759,7 @@ HINSHI and FUZOKUGO are information of preceding bunsetsu."
   (cond
    ((null filename) "")
    ((null (file-readable-p filename)) (- (wnn-const WNN_FILE_READ_ERROR)))
-   (t 
+   (t
     (wnnrpc-with-temp-buffer
       (insert-file-contents filename nil 0 (1- (wnn-const WNN_PASSWD_LEN)))
       (goto-char 1)
@@ -1768,4 +1768,4 @@ HINSHI and FUZOKUGO are information of preceding bunsetsu."
 	  (backward-char))
       (buffer-substring 1 (point))))))
 
-;;; egg/wnnrpc.el ends here.
+;;; egg/wnnrpc.el ends here

@@ -43,6 +43,7 @@
 
 (defvar its-select-alist nil)
 (make-variable-buffer-local 'its-select-func-alist)
+(setq-default its-select-func-alist nil)
 (put 'its-select-alist 'permanent-local t)
 
 (defvar its-select-func-default-alist nil)

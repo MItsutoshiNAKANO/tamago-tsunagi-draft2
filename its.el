@@ -101,7 +101,7 @@ This variable override `its-delete-by-keystroke'."
 (make-variable-buffer-local 'its-previous-select-func)
 (put 'its-previous-select-func 'permanent-local t)
 
-(defvar its-current-language)
+(defvar its-current-language nil)
 (make-variable-buffer-local 'its-current-language)
 (put 'its-current-language 'permanent-local t)
 
@@ -247,7 +247,7 @@ This variable override `its-delete-by-keystroke'."
   (if (consp (cdr syl))
       (cons (its-get-output syl) (its-get-keyseq-syl syl))
     syl))
-    
+
 ;;
 ;;
 
@@ -275,8 +275,8 @@ This variable override `its-delete-by-keystroke'."
     (define-key map "\M-y" 'its-yank-pop)
     (define-key map [backspace] 'its-delete-backward-SYL)
     (define-key map [delete] 'its-delete-backward-SYL)
-    (define-key map [M-backspace] 'its-delete-backward-SYL-by-keystroke)
-    (define-key map [M-delete] 'its-delete-backward-SYL-by-keystroke)
+    (define-key map [(meta backspace)] 'its-delete-backward-SYL-by-keystroke)
+    (define-key map [(meta delete)] 'its-delete-backward-SYL-by-keystroke)
     (define-key map [right] 'its-forward-SYL)
     (define-key map [left] 'its-backward-SYL)
     (while (< i 127)
@@ -834,7 +834,7 @@ Return last state."
 	(setq state next-state))
        ((null build-if-none)
 	(error "No such state (%s)" input))
-       (t 
+       (t
 	(if (not (or brand-new (= i 1) (its-get-kst/t state)))
 	    (its-set-interim-terminal-state state))
 	(setq state (its-make-next-state state key
@@ -1082,7 +1082,7 @@ Return last state."
 	(signal 'beginning-of-buffer nil))
     (delete-region p (point))
     (if (> len n)
-	(its-state-machine-keyseq (substring keyseq 0 (- len n)) 
+	(its-state-machine-keyseq (substring keyseq 0 (- len n))
 				  'its-buffer-ins/del-SYL)
       (its-set-cursor-status
        (if (or (null its-delete-by-keystroke)
@@ -1556,5 +1556,31 @@ Return last state."
     (princ (documentation 'its-mode))
     (help-setup-xref (cons #'help-xref-mode (current-buffer)) (interactive-p))))
 
+;; The `point-left' hook function will never be called in Emacs 21.2.50
+;; when the command `next-line' is used in the last line of a buffer
+;; which isn't terminated with a newline or the command `previous-line'
+;; is used in the first line of a buffer.
+(defun its-next-line (&optional arg)
+  "Go to the end of the line if the line isn't terminated with a newline,
+otherwise run `next-line' as usual."
+  (interactive "p")
+  (if (= (line-end-position) (point-max))
+      (end-of-line)
+    (next-line arg)))
+
+(defun its-previous-line (&optional arg)
+  "Go to the beginning of the line if it is called in the first line of a
+buffer, otherwise run `previous-line' as usual."
+  (interactive "p")
+  (if (= (line-beginning-position) (point-mim))
+      (beginning-of-line)
+    (previous-line arg)))
+
+(substitute-key-definition 'next-line 'its-next-line
+			   its-mode-map global-map)
+(substitute-key-definition 'previous-line 'its-previous-line
+			   its-mode-map global-map)
+
 (provide 'its)
-;;; its.el ends here.
+
+;;; its.el ends here

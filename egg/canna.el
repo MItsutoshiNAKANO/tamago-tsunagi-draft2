@@ -41,9 +41,9 @@
   "Hostname of CANNA server"
   :group 'canna :type 'string)
 
-(defcustom canna-server-port 5680
-  "Port number of CANNA server"
-  :group 'canna :type 'integer)
+(defcustom canna-server-port "canna"
+  "A service name or a port number (should be a string) of CANNA server"
+  :group 'canna :type 'string)
 
 (defcustom canna-user-name nil
   "User Name on CANNA server"
@@ -283,7 +283,7 @@ katakana to candidates list. NOSTUDY specifies not study."
       (canna-arg-type-error canna-define-environment))
   (setq canna-current-envspec (canna-envspec-create env-name
 						    convert-mode nostudy)
-	canna-envspec-list (nconc canna-envspec-list 
+	canna-envspec-list (nconc canna-envspec-list
 				  (list canna-current-envspec))))
 
 (defun canna-add-dict (dict dict-rw)
@@ -328,8 +328,10 @@ katakana to candidates list. NOSTUDY specifies not study."
 		  hostname-list (cdr hostname-list))
 	    (if (null (string-match ":" hostname))
 		(setq port canna-server-port)
-	      (setq port (string-to-int (substring hostname (match-end 0)))
+	      (setq port (substring hostname (match-end 0))
 		    hostname (substring hostname 0 (match-beginning 0))))
+	    (if (and (stringp port) (string-match "^[0-9]+$" port))
+		(setq port (string-to-int port)))
 	    (and (equal hostname "")
 		 (setq hostname (or (getenv "CANNAHOST") "localhost")))
 	    (let ((inhibit-quit save-inhibit-quit))
@@ -345,7 +347,7 @@ katakana to candidates list. NOSTUDY specifies not study."
 		((error quit))))
 	    (when proc
 	      (process-kill-without-query proc)
-	      (set-process-coding-system proc 'no-conversion 'no-conversion)
+	      (set-process-coding-system proc 'binary 'binary)
 	      (set-process-sentinel proc 'canna-comm-sentinel)
 	      (set-marker-insertion-type (process-mark proc) t)
 	      (setq result (cannarpc-open proc user-name)) ;; result is context
@@ -379,7 +381,7 @@ katakana to candidates list. NOSTUDY specifies not study."
   "Return the backend of CANNA environment."
   (let ((env (canna-search-environment backend))
 	proc context error)
-    (or env    
+    (or env
 	(unwind-protect
 	    (let* ((language (canna-backend-get-language backend))
 		   specs)
@@ -470,6 +472,17 @@ katakana to candidates list. NOSTUDY specifies not study."
 (defun canna-init ()
   )
 
+(defun canna-set-converted-yomi (bunsetsu-pos bunsetsu-list)
+  (let ((bl bunsetsu-list)
+	(i bunsetsu-pos)
+	b)
+    (while bl
+      (setq b (car bl))
+      (canna-bunsetsu-set-source b (cannarpc-get-bunsetsu-source env i))
+      (setq i (1+ i)
+	    bl (cdr bl)))
+    bunsetsu-list))
+
 (defun canna-start-conversion (backend yomi &optional context)
   "Convert YOMI string to kanji, and enter conversion mode.
 Return the list of bunsetsu."
@@ -482,7 +495,7 @@ Return the list of bunsetsu."
 	  (setq env (canna-get-environment backend))
 		(canna-finalize-backend)))
 	  (setq bunsetsu-list (cannarpc-begin-conversion env yomi))))
-    bunsetsu-list))
+    (canna-set-converted-yomi 0 bunsetsu-list)))
 
 (defun canna-end-conversion (bunsetsu-list abort)
   (let* ((env (canna-bunsetsu-get-env (car bunsetsu-list)))
@@ -586,7 +599,9 @@ Return the list of bunsetsu."
 	 (bunsetsu-pos (canna-bunsetsu-get-bunsetsu-pos (car bunsetsu)))
 	 new)
     (if yomi-length
-	(setq new (cannarpc-set-kugiri-changed env yomi-length bunsetsu-pos))
+	(setq new (canna-set-converted-yomi
+		   bunsetsu-pos
+		   (cannarpc-set-kugiri-changed env yomi-length bunsetsu-pos)))
       (setq new bunsetsu))
     (list (list (car new)) prev-b (cdr new))))
 
@@ -778,7 +793,7 @@ Return the list of bunsetsu."
 			  (intern (concat "canna-hinshi-" (symbol-name key)))
 			  kanji yomi))
 	  ((stringp key) (cdr (assoc key canna-hinshi-alist))))))
-	
+
 (defun canna-word-registration (backend kanji yomi)
   "Register a word KANJI with a pronunciation YOMI."
   (if (or (null (eq (egg-get-language 0 kanji)
@@ -807,6 +822,8 @@ Return the list of bunsetsu."
 
 (defun canna-word-delete-regist (backend yomi)
   "Delete a word KANJI from dictionary."
+  (if (= (length yomi) 0)
+      (egg-error "Canna word delete registration: null string"))
   (let* ((env (canna-get-environment backend))
 	 (dic (canna-dictionary-select env))
 	 proc context envd bunsetsu bunsetsu-pos z zpos kouho-list hinshi i

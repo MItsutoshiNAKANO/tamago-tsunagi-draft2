@@ -147,7 +147,7 @@ Don't specify the optional arguments in normal use."
       ((error quit)
        (egg-error "failed to connect sj3 server")))
     (process-kill-without-query proc)
-    (set-process-coding-system proc 'no-conversion 'no-conversion)
+    (set-process-coding-system proc 'binary 'binary)
     (set-marker-insertion-type (process-mark proc) t)
     (save-excursion
       (set-buffer buf)
@@ -198,7 +198,7 @@ Don't specify the optional arguments in normal use."
 ;;       (if proc
 ;; 	  (progn
 ;; 	    (process-kill-without-query proc)
-;; 	    (set-process-coding-system proc 'no-conversion 'no-conversion)
+;; 	    (set-process-coding-system proc 'binary 'binary)
 ;; 	    (set-marker-insertion-type (process-mark proc) t)
 ;; 	    ;; Initialize dictionaries
 ;; 	    (setq sj3-sys-dict-list nil)

@@ -46,7 +46,7 @@
 	(if path
 	    (progn
 	      (setq lpath (cdr-safe 
-			   (member (substring (file-name-directory path) 0 -1)
+			   (member (directory-file-name (file-name-directory path))
 				   lpath))
 		    result (cons path result)))
 	  (progn

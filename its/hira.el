@@ -1,10 +1,8 @@
 ;;; its/hira.el --- Hiragana Input in Egg Input Method Architecture
 
-;; Copyright (C) 1995 Electrotechnical Laboratory, JAPAN.
-;; Licensed to the Free Software Foundation.
+;; Copyright (C) 1999, 2000 Free Software Foundation, Inc
 
-;; Author: Satoru Tomura <tomura@etl.go.jp>
-;;         jiro@math.keio.ac.jp (TANAKA Jiro)
+;; Author: NIIBE Yutaka <gniibe@chroot.org>
 
 ;; Maintainer: TOMURA Satoru <tomura@etl.go.jp>
 
@@ -40,18 +38,39 @@
 (eval-when (compile)
   (defconst its-compaction-enable t))
 
+(defgroup hira nil
+  "Hiragana Input Method"
+  :group 'its)
+
 (defvar its-hira-enable-zenkaku-alphabet
   (if (boundp 'its-enable-fullwidth-alphabet)
       its-enable-fullwidth-alphabet
     t)
   "*Enable Zenkaku alphabet")
 
-(defvar its-hira-enable-double-n nil "*Enable \"nn\" input for \"ん\" ")
-(defvar its-hira-period "。" "*ピリオド")  ; ". " "．"
-(defvar its-hira-comma  "、" "*コンマ")    ; ", " "，"
-(defvar its-hira-open-bracket  "「" "*[")  ; "［"
-(defvar its-hira-close-bracket  "」" "*]") ; "］"
-(defvar its-hira-horizontal  "ー" "*-")    ; "−"
+(defcustom its-hira-enable-double-n t
+  "*Enable \"nn\" input for \"ん\" "
+  :group 'hira :type 'boolean)
+
+(defcustom its-hira-period "。" 
+  "* .(ピリオド)を入力したときの句点の文字: \"。\"  \". \" \"．\""
+  :group 'hira :type 'string)
+
+(defcustom its-hira-comma  "、"
+ "* ,(コンマ)を入力したときの読点の文字: \"、\" \", \" \"，\""
+  :group 'hira :type 'string)
+
+(defcustom its-hira-open-bracket  "「"
+ "* [ を入力したときのかぎ括弧開けの文字: \"「\" \"［\""
+  :group 'hira :type 'string)
+
+(defcustom its-hira-close-bracket "」"
+ "* ] を入力したときのかぎ括弧閉じの文字: \"」\" \"］\""
+  :group 'hira :type 'string)
+
+(defcustom its-hira-horizontal  "ー"
+  "* - を入力したときの長音記号の文字: \"ー\" \"−\""
+  :group 'hira :type 'string)
 
 (define-its-state-machine its-hira-map
   "roma-kana" "あ" Japanese

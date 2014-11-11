@@ -1,3 +1,22 @@
+2004-11-22  Kubo Hiroshi  <hiroshi-news@netird.ad.jp>
+	In fj.sources, <20041122.035305.59473152.hiroshi-news@netird.ad.jp>
+
+	* its/jiskana.el: New file.
+
+	* Makefile.in (ITSSRCS): Add its/jiskana.el.
+
+	* its-keydef.el (its-define-select-key-list): Add jiskana.
+
+2004-07-02  SANETO Takanori  <sanewo@ba2.so-net.ne.jp>
+
+	* egg/anthy.el (anthy-new-environment): Use anthyipc-get-greeting
+	only right after starting the anthy-agent process.
+
+2004-05-21  Jun Kuriyama  <kuriyama@imgsrc.co.jp>
+
+	* Makefile.in (install-site): Put the .nosearch file into egg and
+	its subdirectories.
+
 2002-09-09  NIIBE Yutaka  <gniibe@m17n.org>
 
 	Check JIS x0213 support at compile time.

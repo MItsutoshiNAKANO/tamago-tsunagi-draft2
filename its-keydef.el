@@ -141,6 +141,8 @@
   ("D"    "D"    quanjiao-downcase-tw quanjiao quanjiao-down-tw)
   ("H"    "H"    hangul               hangul   hangul)
   ("J"    "J"    jeonkak-upcase       jeonkak  jeonkak-up)
-  ("j"    "j"    jeonkak-downcase     jeonkak  jeonkak-down)))
+  ("j"    "j"    jeonkak-downcase     jeonkak  jeonkak-down)
+  ("W"    "W" jiskana             jiskana     jiskana)
+))
 
 (provide 'its-keydef)

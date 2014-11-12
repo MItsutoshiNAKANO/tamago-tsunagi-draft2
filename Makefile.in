@@ -55,6 +55,7 @@ TOPSRCS	= \
 	menudiag.el \
 	its.el \
 	its-keydef.el \
+	leim-list.el \
 
 #
 EGGSRCS	= \
@@ -74,6 +75,7 @@ ITSSRCS	= \
 	its/hankata.el \
 	its/hira.el \
 	its/jeonkak.el \
+        its/greek.el \
 	its/pinyin.el \
 	its/hangul.el \
 	its/kata.el \

@@ -1,0 +1,18 @@
+Source: egg
+Section: utils
+Priority: extra
+Maintainer: ISHIKAWA Mutsumi <ishikawa@debian.org>
+Build-Depends: debhelper (>> 5.0.0)
+Standards-Version: 3.8.3
+
+Package: egg
+Architecture: all
+Pre-Depends: make
+Depends: emacs23 | emacs23-lucid | emacs23-nox | emacs22 | emacs22-gtk | emacs22-nox | emacs-snapshot-gtk | emacs-snapshot-lucid |emacs-snapshot | emacs-snapshot-nox
+Conflicts: emacs-dl-wnn
+Suggests: canna, freewnn-jserver, freewnn-cserver, freewnn-kserver, anthy
+Description: Tamago Ver. 4 -- EGG Input Method Architecture for Emacsen
+ Tamago version 4 (aka egg4) is Input Method Architecture for
+ emacsen. All of these is written by elisp (you don't need to modify emacsen).
+ It can use with FreeWnn (jserver, cserver, tserver), Wnn6/Wnn7/Wnn8 jserver,
+ Canna server and Anthy server.

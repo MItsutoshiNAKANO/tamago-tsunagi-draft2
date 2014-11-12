@@ -37,11 +37,11 @@
   "CANNA interface for Tamago 4."
   :group 'egg)
 
-(defcustom canna-hostname "localhost"
+(defcustom canna-hostname "unix/"
   "Hostname of CANNA server"
   :group 'canna :type 'string)
 
-(defcustom canna-server-port "canna"
+(defcustom canna-server-port "/tmp/.iroha_unix/IROHA"
   "A service name or a port number (should be a string) of CANNA server"
   :group 'canna :type 'string)
 
@@ -52,6 +52,10 @@
 (defcustom canna-group-name nil
   "Group Name on CANNA server"
   :group 'canna :type 'string)
+
+(defcustom egg-canna-helper-path "egg-helper"
+  "path of canna unix domain connection helper program"
+  :group 'canna :type 'file)
 
 ; (eval-when-compile
 ;   (defmacro CANNA-const (c)
@@ -326,14 +330,23 @@ katakana to candidates list. NOSTUDY specifies not study."
 	  (while (and hostname-list (null proc))
 	    (setq hostname (or (car hostname-list) "")
 		  hostname-list (cdr hostname-list))
-	    (if (null (string-match ":" hostname))
-		(setq port canna-server-port)
-	      (setq port (substring hostname (match-end 0))
-		    hostname (substring hostname 0 (match-beginning 0))))
-	    (if (and (stringp port) (string-match "^[0-9]+$" port))
-		(setq port (string-to-int port)))
-	    (and (equal hostname "")
-		 (setq hostname (or (getenv "CANNAHOST") "localhost")))
+	    (if (null (string-match "^unix/" hostname))
+		(progn
+		  (if (null (string-match ":" hostname))
+		      (setq port canna-server-port)
+		    (setq port (substring hostname (match-end 0))
+			  hostname (substring hostname 0 (match-beginning 0))))
+		  (if (and (stringp port) (string-match "^[0-9]+$" port))
+		      (setq port (string-to-int port)))
+		  (and (equal hostname "")
+		       (setq hostname (or (getenv "CANNAHOST") "localhost")))
+		  (setq host hostname)
+		  (setq family nil))
+	      (setq family 'local)
+	      (setq host nil)
+	      (setq port canna-server-port)
+	      (if (null (and (stringp port) (string-match "IROHA$" port)))
+		  (setq port "/tmp/.iroha_unix/IROHA")))
 	    (let ((inhibit-quit save-inhibit-quit))
 	      (if (and msg
 		       (null (y-or-n-p (format "%s failed. Try to %s? "
@@ -342,10 +355,18 @@ katakana to candidates list. NOSTUDY specifies not study."
 	    (setq msg (format "Canna: connecting to %s..." hostname))
 	    (message "%s" msg)
 	    (let ((inhibit-quit save-inhibit-quit))
-	      (condition-case nil
-		  (setq proc (open-network-stream proc-name buf hostname port))
-		((error quit))))
-	    (when proc
+	      (if (fboundp 'make-network-process)
+		  (condition-case nil
+		      (setq proc (make-network-process :name proc-name :buffer buf :host host :service port :family family))
+		    ((error quit)))
+		; for old emacs (<= 21.3) bellow
+		(if (string-match "^unix/" hostname)
+		    (let ((process-connection-type nil))
+		      (setq proc (start-process proc-name buf egg-canna-helper-path port)))
+		  (condition-case nil
+		      (setq proc (open-network-stream proc-name buf hostname port))
+		    (error quit)))))
+	    (when (processp proc)
 	      (process-kill-without-query proc)
 	      (set-process-coding-system proc 'binary 'binary)
 	      (set-process-sentinel proc 'canna-comm-sentinel)
@@ -353,7 +374,7 @@ katakana to candidates list. NOSTUDY specifies not study."
 	      (setq result (cannarpc-open proc user-name)) ;; result is context
 	      (if (= result -1)
 		  (progn
-	  (delete-process proc)
+		    (delete-process proc)
 		    (setq proc nil))
 		(cannarpc-notice-group-name proc result group)
 		(cannarpc-set-app-name proc result "EGG4"))))
@@ -632,7 +653,7 @@ Return the list of bunsetsu."
     (unless (eq action 'save-only)
       (while proc-list
 	(if (and (car proc-list)
-		 (eq (process-status (car proc-list)) 'open))
+		 (memq (process-status (car proc-list)) '(open run)))
 	    (cannarpc-close (car proc-list)))
 	(setq proc-list (cdr proc-list)))))
   (setq canna-environments nil))

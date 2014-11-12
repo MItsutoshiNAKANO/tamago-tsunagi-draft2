@@ -126,8 +126,30 @@
 	  ((eq c 'JS_FI_DIC_LIST_ALL)         ?\xf00082)
 	  ((eq c 'JS_FUZOKUGO_LIST)           ?\xf00083)
 
+	  ((eq c 'JS_YOSOKU_INIT)                 ?\xf01001)
+	  ((eq c 'JS_YOSOKU_FREE)                 ?\xf01002)
+	  ((eq c 'JS_YOSOKU_YOSOKU)               ?\xf01003)
+	  ((eq c 'JS_YOSOKU_TOROKU)               ?\xf01004)
+	  ((eq c 'JS_YOSOKU_SELECTED_CAND)        ?\xf01005)
+	  ((eq c 'JS_YOSOKU_DELETE_CAND)          ?\xf01006)
+	  ((eq c 'JS_YOSOKU_CANCEL_LATEST_TOROKU) ?\xf01007)
+	  ((eq c 'JS_YOSOKU_RESET_PRE_YOSOKU)     ?\xf01008)
+	  ((eq c 'JS_YOSOKU_IKKATSU_TOROKU)       ?\xf01009)
+	  ((eq c 'JS_YOSOKU_SAVE_DATALIST)        ?\xf0100a)
+	  ((eq c 'JS_YOSOKU_INIT_TIME_KEYDATA)    ?\xf0100b)
+	  ((eq c 'JS_YOSOKU_INIT_INPUTINFO)       ?\xf0100c)
+	  ((eq c 'JS_YOSOKU_SET_USER_INPUTINFO)   ?\xf0100d)
+	  ((eq c 'JS_YOSOKU_SET_TIMEINFO)         ?\xf0100e)
+	  ((eq c 'JS_YOSOKU_STATUS)               ?\xf0100f)
+	  ((eq c 'JS_YOSOKU_SET_PARAM)            ?\xf01010)
+	  ((eq c 'JS_YOSOKU_IKKATSU_TOROKU_INIT)  ?\xf01011)
+	  ((eq c 'JS_YOSOKU_IKKATSU_TOROKU_END)   ?\xf01012)
+	  ((eq c 'JS_HENKAN_ASSOC)                ?\xf01013)
+
 	  ((eq c 'JLIB_VERSION)       ?\x4003)
 	  ((eq c 'JLIB_VERSION_WNN6)  ?\x4f00)
+	  ((eq c 'JLIB_VERSION_WNN7)  ?\x4f01)
+	  ((eq c 'JLIB_VERSION_WNN8)  ?\x4f02)
 
 	  ((eq c 'WNN_C_LOCAL)            "!")
 	  ((eq c 'WNN_FT_DICT_FILE)         1)
@@ -709,8 +731,10 @@
     (wnnrpc-get-result)))
 
 (defun wnnrpc-open (proc myhostname username)
-  "Open the session.  Return wnn4 or wnn6 on success, NIL on failure."
-  (let ((type-list `((wnn6 . ,(wnn-const JLIB_VERSION_WNN6))
+  "Open the session.  Return wnn4/wnn6/wnn7 or wnn8 on success, NIL on failure."
+  (let ((type-list `((wnn8 . ,(wnn-const JLIB_VERSION_WNN8))
+		     (wnn7 . ,(wnn-const JLIB_VERSION_WNN7))
+		     (wnn6 . ,(wnn-const JLIB_VERSION_WNN6))
 		     (wnn4 . ,(wnn-const JLIB_VERSION))))
 	(result (- (wnn-const WNN_BAD_VERSION)))
 	type version)
@@ -880,6 +904,38 @@ before remove and create new file."
 		 (aref v  5) (aref v  6) (aref v  7) (aref v  8) (aref v  9)
 		 (aref v 10) (aref v 11) (aref v 12) (aref v 13) (aref v 14)
 		 (aref v 15) (aref v 16) (aref v 17))
+    (wnnrpc-get-result)))
+
+(defun wnn7rpc-set-conversion-env-param (env mask v)
+  "Set Wnn7 conversion parameter."
+  (wnnrpc-call-with-environment env ()
+    (comm-format (u u u i i i i i i i i i i i i i i i i i i i i i i i i)
+                 (wnn-const JS_SET_HENKAN_ENV)
+                 env-id mask
+                 (aref v  0) (aref v  1) (aref v  2) (aref v  3) (aref v  4)
+                 (aref v  5) (aref v  6) (aref v  7) (aref v  8) (aref v  9)
+                 (aref v 10) (aref v 11) (aref v 12) (aref v 13) (aref v 14)
+                 (aref v 15) (aref v 16) (aref v 17) 
+		 ;; (aref v 18)
+		 ;; (aref v 19)
+                 ;; (aref v 20)
+		 ;; (aref v 21)
+		 ;; (aref v 22)
+		 ;; (aref v 23))
+		 0 10 0 0 0 0)
+    (wnnrpc-get-result)))
+
+(defun wnn7rpc-set-conversion-env-param-highbit (env maskh maskl v)
+  "Set Wnn7 conversion parameter (use high bit mask)."
+  (wnnrpc-call-with-environment env ()
+    (comm-format (u u w w i i i i i i i i i i i i i i i i i i i i i i i i)
+                 (wnn-const JS_SET_HENKAN_ENV)
+                 env-id maskh maskl
+                 (aref v  0) (aref v  1) (aref v  2) (aref v  3) (aref v  4)
+                 (aref v  5) (aref v  6) (aref v  7) (aref v  8) (aref v  9)
+                 (aref v 10) (aref v 11) (aref v 12) (aref v 13) (aref v 14)
+                 (aref v 15) (aref v 16) (aref v 17) (aref v 18) (aref v 19)
+                 (aref v 20) (aref v 21) (aref v 22) (aref v 23))
     (wnnrpc-get-result)))
 
 (defun wnnrpc-temporary-dic-loaded (env)
@@ -1238,6 +1294,21 @@ HINSHI and FUZOKUGO are information of preceding bunsetsu."
 		   p10 p11 p12 p13 p14 p15 p16 p17 p18)
       (vector p1 p2 p3 p4 p5 p6 p7 p8 p9
 	      p10 p11 p12 p13 p14 p15 p16 p17 p18))))
+
+(defun wnn7rpc-get-conversion-env-param (env)
+  ""
+  (wnnrpc-call-with-environment env (p1 p2 p3 p4 p5 p6 p7 p8 p9
+                                    p10 p11 p12 p13 p14 p15 p16 p17 p18
+                                    p19 p20 p21 p22 p23 p24)
+    (comm-format (u u) (wnn-const JS_GET_HENKAN_ENV) env-id)
+    (wnnrpc-get-result
+      (comm-unpack (i i i i i i i i i i i i i i i i i i i i i i i i)
+                   p1 p2 p3 p4 p5 p6 p7 p8 p9
+                   p10 p11 p12 p13 p14 p15 p16
+                   p17 p18 p19 p20 p21 p22 p23 p24)
+      (vector p1 p2 p3 p4 p5 p6 p7 p8 p9
+              p10 p11 p12 p13 p14 p15 p16 p17 p18
+              p19 p20 p21 p22 p23 p24))))
 
 (defun wnnrpc-file-loaded (proc path)
   ""
@@ -1708,7 +1779,7 @@ HINSHI and FUZOKUGO are information of preceding bunsetsu."
 	       (eq type (wnn-const CWNN_REV_DICT))
 	       (eq type (wnn-const BWNN_REV_DICT))
 	       (eq type (wnn-const WNN_UD_DICT))
-	       (and (wnnenv-is-wnn6 env)
+	       (and (or (wnnenv-is-wnn6 env) (wnnenv-is-wnn7 env) (wnnenv-is-wnn8 env))
 		    (eq type (wnn-const WNN_FI_USER_DICT))))
 	   (wnnrpc-create-and-move-to-client env nil dicname type
 					     comment passwd hpasswd))
@@ -1768,4 +1839,175 @@ HINSHI and FUZOKUGO are information of preceding bunsetsu."
 	  (backward-char))
       (buffer-substring 1 (point))))))
 
-;;; egg/wnnrpc.el ends here
+;;; egg/wnnrpc.el ends here.
+
+;;;
+;;; Wnn7 new function:
+;;;   Input Prediction
+;;;
+;;;
+(defun wnn7rpc-yosoku-init (env)
+  "Initialize input prediction function"
+  (wnnrpc-call-with-environment env ()
+    (comm-format (u u) (wnn-const JS_YOSOKU_INIT) env-id)
+    (wnnrpc-get-result)))
+
+(defun wnn7rpc-yosoku-free (env)
+  "Free input prediction function area from server."
+  (wnnrpc-call-with-environment env ()
+    (comm-format (u u) (wnn-const JS_YOSOKU_FREE) env-id)
+    (wnnrpc-get-result)))
+(defun wnn7rpc-yosoku-yosoku (env moji)
+  "Execute input prediction."
+  (wnnrpc-call-with-environment env (candnum len kouho kouho-list)
+    (comm-format (u u E) (wnn-const JS_YOSOKU_YOSOKU) env-id moji)
+    (wnnrpc-get-result
+      (comm-unpack (i) candnum)
+      (while (> candnum 0)
+       (comm-unpack (u s) len kouho)
+       (setq kouho (decode-coding-string kouho 'euc-jp))
+       (setq kouho-list (nconc kouho-list (list kouho))
+             candnum (1- candnum)))
+      kouho-list)))
+
+(defun wnn7rpc-yosoku-toroku (env bun-suu yosoku-bunsetsu)
+  "Register the input prediction candidate."
+  (wnnrpc-call-with-environment env ()
+    (progn
+      (comm-format (u u u) (wnn-const JS_YOSOKU_TOROKU) env-id bun-suu)
+      (while yosoku-bunsetsu
+       (comm-format (E u E u u)
+                    (aref (car yosoku-bunsetsu) 0)
+                    (aref (car yosoku-bunsetsu) 1)
+                    (aref (car yosoku-bunsetsu) 2)
+                    (aref (car yosoku-bunsetsu) 3)
+                    (aref (car yosoku-bunsetsu) 4))
+       (setq yosoku-bunsetsu (cdr yosoku-bunsetsu))))
+    (wnnrpc-get-result)))
+
+(defun wnn7rpc-yosoku-selected-cand (env selectpos)
+  "Select the input prediction candidate."
+  (wnnrpc-call-with-environment env ()
+    (comm-format (u u u) (wnn-const JS_YOSOKU_SELECTED_CAND)
+                env-id selectpos)
+    (wnnrpc-get-result)))
+
+(defun wnn7rpc-yosoku-delete-cand (env selectpos)
+  "Delete the input prediction candidate."
+  (wnnrpc-call-with-environment env ()
+    (comm-format (u u u) (wnn-const JS_YOSOKU_DELETE_CAND)
+                env-id selectpos)
+    (wnnrpc-get-result)))
+
+(defun wnn7rpc-yosoku-cancel-latest-toroku (env)
+  "Cancel the latest registered word."
+  (wnnrpc-call-with-environment env ()
+    (comm-format (u u) (wnn-const JS_YOSOKU_CANCEL_LATEST_TOROKU) env-id)
+    (wnnrpc-get-result)))
+
+(defun wnn7rpc-yosoku-reset-pre-yosoku (env)
+  "Clear the connection information for the latest registered word."
+  (wnnrpc-call-with-environment env ()
+    (comm-format (u u) (wnn-const JS_YOSOKU_RESET_PRE_YOSOKU) env-id)
+    (wnnrpc-get-result)))
+
+(defun wnn7rpc-yosoku-ikkatsu-toroku (env torokustr)
+  "Register the input prediction candidate with phrase analysis."
+  (wnnrpc-call-with-environment env ()
+    (comm-format (u u S) (wnn-const JS_YOSOKU_IKKATSU_TOROKU)
+                env-id torokustr)
+    (wnnrpc-get-result)))
+
+(defun wnn7rpc-yosoku-save-datalist (env)
+  "Save the input prediction data in data file."
+  (wnnrpc-call-with-environment env ()
+    (comm-format (u u) (wnn-const JS_YOSOKU_SAVE_DATALIST) env-id)
+    (wnnrpc-get-result)))
+
+(defun wnn7rpc-yosoku-init-time-keydata (env)
+  "Initialize input efficiency data about inputed key."
+  (wnnrpc-call-with-environment env ()
+    (comm-format (u u) (wnn-const JS_YOSOKU_INIT_TIME_KEYDATA) env-id)
+    (wnnrpc-get-result)))
+
+(defun wnn7rpc-yosoku-init-inputinfo (env)
+  "Initialize input efficiency data about input time."
+  (wnnrpc-call-with-environment env ()
+    (comm-format (u u) (wnn-const JS_YOSOKU_INIT_INPUTINFO) env-id)
+    (wnnrpc-get-result)))
+
+(defun wnn7rpc-yosoku-set-user-inputinfo (env allkey userkey yosokuselect)
+  "Set user input information to the input efficiency data."
+  (wnnrpc-call-with-environment env ()
+    (comm-format (u u u u) (wnn-const JS_YOSOKU_SET_USER_INPUTINFO)
+                env-id allkey
+                (if yosokuselect
+                    (logior userkey ?\x8000)
+                  userkey))
+    (wnnrpc-get-result)))
+
+(defun wnn7rpc-yosoku-set-timeinfo (env yosokuselect throughyosoku inputtime
+                                      keylen)
+  "Set input-time information to the input efficiency data."
+  (wnnrpc-call-with-environment env ()
+    (comm-format (u u u u u u) (wnn-const JS_YOSOKU_SET_TIMEINFO)
+                env-id yosokuselect throughyosoku inputtime keylen)
+    (wnnrpc-get-result)))
+
+(defun wnn7rpc-yosoku-status (env)
+  "Get input efficiency information."
+  (wnnrpc-call-with-environment env (totalrod totalallkey totaluserkey
+                                    totalrot totalalltime totalusertime
+                                    stmday sthour stmin ltmday lthour ltmin
+                                    totalroykinput totalallykkey nowrod
+                                    nowallkey nowuserkey nowrot nowalltime
+                                    nowusertime timeperonekey)
+    (comm-format (u u) (wnn-const JS_YOSOKU_STATUS) env-id)
+    (comm-unpack (i) totalrod)
+    (if (< totalrod 0)
+       totalrod
+      (comm-unpack (u u u u u u u u u u u u u u u u u u u u)
+                  totalallkey totaluserkey
+                  totalrot totalalltime totalusertime
+                  stmday sthour stmin ltmday lthour ltmin
+                  totalroykinput totalallykkey
+                  nowrod nowallkey nowuserkey nowrot nowalltime nowusertime
+                  timeperonekey)
+      (vector totalrod totalallkey totaluserkey totalrot totalalltime
+             totalusertime stmday sthour stmin ltmday lthour ltmin
+             totalroykinput totalallykkey nowrod nowallkey nowuserkey
+             nowrot nowalltime nowusertime timeperonekey))))
+
+;;;
+;;; Wnn7 new function:
+;;;   association translation
+;;;
+(defun wnn7rpc-assoc-with-data (env yomi hinsi fuzokugo v
+                                  jilihin yomi_org jililen yomilen kanjilen
+                                  real_kanjilen)
+  "Convert YOMI string into Kanji with association."
+  (wnnrpc-call-with-environment env (kanji-length)
+       (comm-format (u u S i S i i u S i i i i) (wnn-const JS_HENKAN_ASSOC)
+                    env-id yomi hinsi fuzokugo
+                    (or v (wnn-const WNN_VECT_KANZEN))
+                    (if v (wnn-const WNN_VECT_KANZEN) (wnn-const WNN_VECT_NO))
+                    jilihin yomi_org jililen yomilen kanjilen real_kanjilen)
+       (wnnrpc-get-result
+        (comm-unpack (u) kanji-length) ; ignore kanji-length
+        (mapcar (lambda (b)
+                  (wnn7-bunsetsu-set-dai-continue b
+                                                  (wnn7-bunsetsu-connect-next b))
+                  (list b))
+                (wnn7rpc-receive-sho-bunsetsu-list env result)))))
+
+
+(defun wnn7rpc-set-henkan-hinshi (env mode nhinshi hlist)
+  ""
+  (wnnrpc-call-with-environment env ()
+     (progn
+       (comm-format (u u i i) (wnn-const JS_SET_HENKAN_HINSI)
+                   env-id mode nhinshi)
+       (while hlist
+        (comm-format (u) (car hlist))
+        (setq hlist (cdr hlist))))
+     (wnnrpc-get-result)))

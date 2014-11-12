@@ -1,0 +1,3 @@
+usr/lib/egg
+usr/share/emacs/site-lisp/egg
+etc/emacs/site-start.d

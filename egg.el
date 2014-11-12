@@ -30,7 +30,7 @@
 
 ;;; Code:
 
-(defconst egg-version "4.0.6"
+(defconst egg-version "4.0.6+20020909cvs"
   "Version number for this version of Tamago.")
 
 (eval-when-compile

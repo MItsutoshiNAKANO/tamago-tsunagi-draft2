@@ -1561,25 +1561,23 @@ Return last state."
 ;; which isn't terminated with a newline or the command `previous-line'
 ;; is used in the first line of a buffer.
 (defun its-next-line (&optional arg)
-  "Go to the end of the line if the line isn't terminated with a newline,
-otherwise run `next-line' as usual."
+  "Go to the end of the line if the line isn't terminated with a newline, otherwise run `next-line' as usual."
   (interactive "p")
   (if (= (line-end-position) (point-max))
       (end-of-line)
     (next-line arg)))
 
 (defun its-previous-line (&optional arg)
-  "Go to the beginning of the line if it is called in the first line of a
-buffer, otherwise run `previous-line' as usual."
+  "Go to the beginning of the line if it is called in the first line of a buffer, otherwise run `previous-line' as usual."
   (interactive "p")
   (if (= (line-beginning-position) (point-min))
       (beginning-of-line)
     (previous-line arg)))
 
 (substitute-key-definition 'next-line 'its-next-line
-			   its-mode-map global-map)
+                          its-mode-map global-map)
 (substitute-key-definition 'previous-line 'its-previous-line
-			   its-mode-map global-map)
+                          its-mode-map global-map)
 
 (provide 'its)
 

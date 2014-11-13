@@ -828,9 +828,10 @@ V: Fixed length string (0x00 terminated).  This takes 2 args (data length)."
 ;; Do not move the point, leave it where it was.
 (defmacro comm-accept-process-output ()
   `(let ((p (point)))
-     (if (null (accept-process-output proc comm-accept-timeout))
-	 (egg-error "backend timeout (comm-accept-process-output)"))
-     (goto-char p)))
+     (with-local-quit
+       (if (null (accept-process-output proc comm-accept-timeout))
+	   (egg-error "backend timeout (comm-accept-process-output)"))
+       (goto-char p))))
 
 (defmacro comm-require-process-output (n)
   `(if (< (point-max) (+ (point) ,n))
@@ -839,10 +840,11 @@ V: Fixed length string (0x00 terminated).  This takes 2 args (data length)."
 (defun comm-wait-for-space (proc n)
   (let ((p (point))
 	(r (+ (point) n)))
-    (while (< (point-max) r)
-      (if (null (accept-process-output proc comm-accept-timeout))
-	  (egg-error "backend timeout (comm-wait-for-space)"))
-      (goto-char p))))
+    (with-local-quit
+      (while (< (point-max) r)
+	(if (null (accept-process-output proc comm-accept-timeout))
+	    (egg-error "backend timeout (comm-wait-for-space)"))
+	(goto-char p)))))
 
 (defmacro comm-following+forward-char ()
   `(prog1

@@ -1,6 +1,30 @@
 ;;; egg-cnv.el --- Conversion Backend in Egg Input Method Architecture
+;;;;;;;;;;;;;;;; About copyright notice ;;;;;;;;;;;;;;;;
+;;;
+;;; This code was originally written by NIIBE Yutaka in 1997 and 1998.
+;;; It was plan to assign copyright to FSF and merged into GNU Emacs.
 
-;; Copyright (C) 1999,2000 PFU LIMITED
+;;; Based on my own work, the feature of mixture of multiple languages
+;;; support was added, the feature was written by an employee of PFU
+;;; LIMITED.  Because of that, it seems for me that a maintainer (at
+;;; that time) added the copyright notice like:
+
+	;; Copyright (C) 1999,2000 PFU LIMITED
+
+;;; But, I don't agree that this file is entirely copyrighted by PFU
+;;; LIMITED.  It's only for some parts, at maximum.
+;;;
+;;; I never assigned my code to PFU LIMITED.
+;;;
+;;; Although the copyright notice was wrong or not that accurate at
+;;; least, everyone in the project(including the maintainer and PFU
+;;; LIMITED) agreed to distribute the code under GPLv2+.
+;;;
+;;; Please don't do that again.  Please agree and prepare your
+;;; assignment to FSF when you develop something for Egg v4.
+;;;
+;;; -- gniibe 2014-10-31
+;;;;;;;;;;;;; 
 
 ;; Author: NIIBE Yutaka <gniibe@chroot.org>
 ;;         KATAYAMA Yoshio <kate@pfu.co.jp>

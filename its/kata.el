@@ -1,5 +1,15 @@
 ;;; its/kata.el --- Katakana Input in Egg Input Method Architecture
 
+;;;;;;;;;;;;;;;; About copyright notice ;;;;;;;;;;;;;;;;
+;;;
+;;; This code was originally written by NIIBE Yutaka in 1997 and 1998,
+;;; using newly written ITS system for hiragana, based on the rules
+;;; defined as Egg version 3.  Then, it was applied to katakana.
+;;;
+;;; It was plan to assign copyright to FSF and merged into GNU Emacs.
+;;;
+;;; This file once had a copyright notice of:
+;;;
 
 ;; Copyright (C) 1995 Electrotechnical Laboratory, JAPAN.
 ;; Licensed to the Free Software Foundation.
@@ -7,6 +17,24 @@
 ;; Author: Satoru Tomura <tomura@etl.go.jp>
 
 ;; Maintainer: TOMURA Satoru <tomura@etl.go.jp>
+
+;;; like Egg version 3.
+;;;
+;;; But, I don't think it applies to this file.
+;;;
+;;; It is unfortunate this file is distributed (once) with this wrong
+;;; copyright notice in the "Tamago Version 4" distribution.
+;;;
+;;; Although the copyright notice was wrong or not that accurate at
+;;; least, everyone in the project (including the maintainer and
+;;; Electrotechnical Laboratory, later renamed to AIST) agreed to
+;;; distribute the code under GPLv2+.
+;;;
+;;; Please don't do that again.  Please agree and prepare your
+;;; assignment to FSF when you develop something for Egg v4.
+;;;
+;;; -- gniibe 2014-11-06
+;;;;;;;;;;;;; 
 
 ;; This file is part of EGG.
 

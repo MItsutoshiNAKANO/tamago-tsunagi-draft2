@@ -33,6 +33,9 @@
 (defconst egg-version "4.0.6+20020909cvs"
   "Version number for this version of Tamago.")
 
+(defconst egg-tsunagi-version egg-version
+  "Version number for this version of Tamago-tsunagi.")
+
 (eval-when-compile
   (require 'cl))
 

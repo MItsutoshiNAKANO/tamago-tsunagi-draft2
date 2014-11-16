@@ -8,4 +8,4 @@
 	  http://lists.debian.or.jp/debian-devel/201411/msg00034.html
 	  http://sourceforge.jp/projects/tamago-tsunagi/lists/archive/misc/2014-Nov
 	  https://anonscm.debian.org/git/pkg-anthy/egg.git/
-
+	* egg.el: add egg-tsunagi-version.

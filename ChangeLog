@@ -1,3 +1,7 @@
+2014-11-17  Mitsutoshi NAKANO  <bkbin005@rinku.zaq.ne.jp>
+
+	* egg.el: egg-version: change version string to "5.0.0.0".
+
 2014-11-16  Mitsutoshi NAKANO  <bkbin005@rinku.zaq.ne.jp>
 	* ChangeLog: rename to ChangeLog.2002-2004.
 	* ChangeLog: create new file.

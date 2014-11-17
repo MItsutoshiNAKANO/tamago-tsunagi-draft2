@@ -32,11 +32,11 @@
 ;;; Code:
 
 (autoload 'egg-activate-anthy "egg/anthy"
-  "Activate ANTHY  backend of Tamago 4." t)
-(autoload 'egg-activate-wnn "egg/wnn" "Activate Wnn backend of Tamago 4." t)
-(autoload 'egg-activate-sj3 "egg/sj3" "Activate SJ3 backend of Tamago 4." t)
+  "Activate ANTHY  backend of Tamago-tsunagi." t)
+(autoload 'egg-activate-wnn "egg/wnn" "Activate Wnn backend of Tamago-tsunagi." t)
+(autoload 'egg-activate-sj3 "egg/sj3" "Activate SJ3 backend of Tamago-tsunagi." t)
 (autoload 'egg-activate-canna "egg/canna"
-  "Activate CANNA backend of Tamago 4." t)
+  "Activate CANNA backend of Tamago-tsunagi." t)
 
 (register-input-method
  "japanese-egg-anthy" "Japanese" 'egg-activate-anthy

@@ -50,7 +50,7 @@
 ;;
 
 (defgroup menudiag nil
-  "Input Translation System of Tamago 4."
+  "Input Translation System of Tamago-tsunagi."
   :group 'egg)
 
 (defcustom menudiag-select-without-return nil

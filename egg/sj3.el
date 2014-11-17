@@ -35,7 +35,7 @@
 (require 'egg-edep)
 
 (defgroup sj3 nil
-  "SJ3 interface for Tamago 4."
+  "SJ3 interface for Tamago-tsunagi."
   :group 'egg)
 
 (defcustom sj3-hostname "localhost"
@@ -476,7 +476,7 @@ Return the list of bunsetsu."
 
 ;;;###autoload
 (defun egg-activate-sj3 (&rest arg)
-  "Activate SJ3 backend of Tamago 4."
+  "Activate SJ3 backend of Tamago-tsunagi."
   (apply 'egg-mode (append arg sj3-backend-alist)))
 
 ;;; egg/sj3.el ends here.

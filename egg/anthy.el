@@ -35,7 +35,7 @@
 (require 'egg-edep)
 
 (defgroup anthy-egg nil
-  "Anthy interface for Tamago 4."
+  "Anthy interface for Tamago-tsunagi."
   :group 'egg)
 
 (defcustom anthy-egg-use-utf8 nil
@@ -514,7 +514,7 @@ Return the list of bunsetsu."
 
 ;;;###autoload
 (defun egg-activate-anthy (&rest arg)
-  "Activate ANTHY backend of Tamago 4."
+  "Activate ANTHY backend of Tamago-tsunagi."
   (apply 'egg-mode (append arg anthy-egg-backend-alist)))
 
 ;;; egg/anthy.el ends here.

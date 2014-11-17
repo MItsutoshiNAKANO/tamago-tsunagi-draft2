@@ -58,7 +58,7 @@
 (require 'egg-edep)
 
 (defgroup egg-conv nil
-  "Conversion Backend Interface of Tamago 4."
+  "Conversion Backend Interface of Tamago-tsunagi."
   :group 'egg)
 
 (defcustom egg-conversion-wrap-select t

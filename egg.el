@@ -42,10 +42,10 @@
 (require 'egg-edep)
 
 (autoload 'egg-simple-input-method "egg-sim"
-  "simple input method for Tamago 4." t)
+  "simple input method for Tamago-tsunagi." t)
 
 (defgroup egg nil
-  "Tamago Version 4.")
+  "Tamago Version 5.")
 
 (defcustom egg-mode-preference t
   "*Make Egg as modefull input method, if non-NIL."

@@ -34,7 +34,7 @@
 (require 'egg-edep)
 
 (defgroup canna nil
-  "CANNA interface for Tamago 4."
+  "CANNA interface for Tamago-tsunagi."
   :group 'egg)
 
 (defcustom canna-hostname "unix/"
@@ -377,7 +377,7 @@ katakana to candidates list. NOSTUDY specifies not study."
 		    (delete-process proc)
 		    (setq proc nil))
 		(cannarpc-notice-group-name proc result group)
-		(cannarpc-set-app-name proc result "EGG4"))))
+		(cannarpc-set-app-name proc result "EGG5"))))
 	  (cons proc result))
       (if proc
 	  (message (concat msg "done"))
@@ -922,7 +922,7 @@ Return the list of bunsetsu."
 
 ;;;###autoload
 (defun egg-activate-canna (&rest arg)
-  "Activate CANNA backend of Tamago 4."
+  "Activate CANNA backend of Tamago-tsunagi."
   (apply 'egg-mode (append arg canna-backend-alist)))
 
 ;;; egg/canna.el ends here.

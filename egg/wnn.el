@@ -36,7 +36,7 @@
 (require 'egg-edep)
 
 (defgroup wnn nil
-  "Wnn interface for Tamago 4."
+  "Wnn interface for Tamago-tsunagi."
   :group 'egg)
 
 (defcustom wnn-auto-save-dictionaries 0
@@ -2264,7 +2264,7 @@ environment."
 
 ;;;###autoload
 (defun egg-activate-wnn (&rest arg)
-  "Activate Wnn backend of Tamago 4."
+  "Activate Wnn backend of Tamago-tsunagi."
   (apply 'egg-mode (append arg wnn-backend-alist)))
 
 ;;; egg/wnn.el ends here.

@@ -1,6 +1,8 @@
 2014-11-17  Mitsutoshi NAKANO  <bkbin005@rinku.zaq.ne.jp>
 
 	* egg.el: egg-version: change version string to "5.0.0.0".
+	* Makefile.in, egg-cnv.el, egg.el, egg/anthy.el, egg/canna.el, egg/sj3.el, egg/wnn.el, its.el, leim-list.el, menudiag.el: change version.
+	  4 -> 5 or tsunagi.
 
 2014-11-16  Mitsutoshi NAKANO  <bkbin005@rinku.zaq.ne.jp>
 	* ChangeLog: rename to ChangeLog.2002-2004.

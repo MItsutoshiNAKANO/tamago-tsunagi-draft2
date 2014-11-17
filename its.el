@@ -37,7 +37,7 @@
 (require 'egg-edep)
 
 (defgroup its nil
-  "Input Translation System of Tamago 4."
+  "Input Translation System of Tamago-tsunagi."
   :group 'egg)
 
 (defcustom its-enable-fullwidth-alphabet t

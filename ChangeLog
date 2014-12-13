@@ -1,3 +1,10 @@
+2014-12-13  Mitsutoshi NAKANO  <bkbin005@rinku.zaq.ne.jp>
+
+	* egg.el: egg-version: change version to "5.0.0.1"
+	* INSTALL: add.
+	* README.ja.UTF-8.txt: rename from README.ja.txt
+	* README.ja.UTF-8.txt: rewrite document.
+
 2014-11-17  Mitsutoshi NAKANO  <bkbin005@rinku.zaq.ne.jp>
 
 	* egg.el: egg-version: change version string to "5.0.0.0".

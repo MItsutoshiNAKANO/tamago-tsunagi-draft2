@@ -1,6 +1,6 @@
 ;;; egg.el --- EGG Input Method Architecture
 
-;; Copyright (C) 1999, 2000 Free Software Foundation, Inc
+;; Copyright (C) 1999-2014 Free Software Foundation, Inc
 
 ;; Author: NIIBE Yutaka <gniibe@chroot.org>
 ;;         KATAYAMA Yoshio <kate@pfu.co.jp>
@@ -30,7 +30,7 @@
 
 ;;; Code:
 
-(defconst egg-version "5.0.0.0"
+(defconst egg-version "5.0.0.1"
   "Version number for this version of Tamago.")
 
 (defconst egg-tsunagi-version egg-version

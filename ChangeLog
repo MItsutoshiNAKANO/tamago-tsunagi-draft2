@@ -1,5 +1,7 @@
 2014-12-15  Mitsutoshi NAKANO  <bkbin005@rinku.zaq.ne.jp>
 
+	* egg.el: egg-version: change version to "5.0.1.0"
+
 	* Makefile.in, egg-cnv.el, egg-com.el, egg-mlh.el, egg-sim.el, egg/anthy.el, egg/canna.el, egg/sj3.el, egg/wnn.el, its.el, menudiag.el:
 	merge from tamago-emacs24-4.0.6.0.20041122.19_8.
 	Hiroshi Sato <hrs@freebsd.org> changed FreeBSD's tamago:

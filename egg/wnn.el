@@ -1283,7 +1283,7 @@ Return the list of bunsetsu."
                      (setq proc (open-network-stream proc-name buf hostname port))
                    (error quit)))))
            (when (processp proc)
-	      (process-kill-without-query proc)
+	      (set-process-query-on-exit-flag proc nil)
 	      (set-process-coding-system proc 'binary 'binary)
 	      (set-process-sentinel proc 'wnn-comm-sentinel)
 	      (set-marker-insertion-type (process-mark proc) t)

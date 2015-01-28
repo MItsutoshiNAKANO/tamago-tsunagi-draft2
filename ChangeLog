@@ -1,7 +1,7 @@
 2015-01-28  Mitsutoshi NAKANO  <bkbin005@rinku.zaq.ne.jp>
 
 	* .gitignore: ignored TAGS
-	* Makefile.in(clean): cleaned TAGS
+	* Makefile.in(tags): added tags entry
 
 2014-12-15  Mitsutoshi NAKANO  <bkbin005@rinku.zaq.ne.jp>
 

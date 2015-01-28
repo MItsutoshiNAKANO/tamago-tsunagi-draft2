@@ -1,9 +1,10 @@
 # Makefile --- Makefile of Tamago-tsunagi
 
-# Copyright (C) 1999, 2000 Free Software Foundation, Inc
+# Copyright (C) 1999, 2000, 2015 Free Software Foundation, Inc
+#               2015 Mitsutoshi NAKANO <bkbin005@rinku.zaq.ne.jp>
 # Author: NIIBE Yutaka <gniibe@chroot.org>
 #         TOMURA Satoru <tomura@etl.go.jp>
-# Maintaner: Satoru Tomura <tomura@etl.go.jp>
+# old Maintaner: Satoru Tomura <tomura@etl.go.jp>
 
 .SUFFIXES:
 SHELL	= @SHELL@
@@ -97,6 +98,7 @@ ITSELCS	= ${ITSSRCS:.el=.elc}
 
 DIST	= ${ETCS} ${SRCS} ${INITELS}
 
+ETAGS	= etags
 
 all: ${ELCS}
 
@@ -108,7 +110,10 @@ all: ${ELCS}
 clean: 
 	rm -f ${ELCS} *~ */*~ \#* .\#* */\#* */.\#* TAGS
 
-distclean: 
+tags:
+	${ETAGS} *.el egg/*.el its/*.el helper/*.c
+
+distclean: clean
 	rm -f ${ELCS} config.* Makefile 
 
 install: install-site

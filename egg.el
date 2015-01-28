@@ -1,11 +1,9 @@
 ;;; egg.el --- EGG Input Method Architecture
 
-;; Copyright (C) 1999-2014 Free Software Foundation, Inc
+;; Copyright (C) 1999-2015 Free Software Foundation, Inc
 
 ;; Author: NIIBE Yutaka <gniibe@chroot.org>
 ;;         KATAYAMA Yoshio <kate@pfu.co.jp>
-
-;; Maintainer: TOMURA Satoru <tomura@etl.go.jp>
 
 ;; Keywords: mule, multilingual, input method
 
@@ -30,7 +28,7 @@
 
 ;;; Code:
 
-(defconst egg-version "5.0.1.0"
+(defconst egg-version "5.0.2.0"
   "Version number for this version of Tamago.")
 
 (defconst egg-tsunagi-version egg-version

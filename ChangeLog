@@ -1,7 +1,12 @@
 2015-01-28  Mitsutoshi NAKANO  <bkbin005@rinku.zaq.ne.jp>
 
+	* egg-sim.el(make-char-list): ignore-errors in make-char
+	  Please see:
+	  http://sourceforge.jp/projects/tamago-tsunagi/lists/archive/misc/2015-January/000029.html
+	* egg.el(egg-version): up from 5.0.1.0 to 5.0.2.0
 	* .gitignore: ignored TAGS
 	* Makefile.in(tags): added tags entry
+	* NEWS(5.0.2.0): created
 
 2014-12-15  Mitsutoshi NAKANO  <bkbin005@rinku.zaq.ne.jp>
 

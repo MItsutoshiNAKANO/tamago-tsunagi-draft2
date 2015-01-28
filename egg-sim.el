@@ -4,11 +4,9 @@
 ;; Copyright (C) 2000 Electrotechnical Laboratory, JAPAN.
 ;; Licensed to the Free Software Foundation.
 ;; Copyright (C) 2000 TOMURA Satoru <tomura@etl.go.jp>
-
+;;               2015 Mitsutoshi NAKANO <bkbin005@rinku.zaq.ne.jp>
 
 ;; Author: TOMURA Satoru <tomura@etl.go.jp>
-
-;; Maintainer: TOMURA Satoru <tomura@etl.go.jp>
 
 ;; Keywords: mule, multilingual, input method
 
@@ -44,6 +42,11 @@
 
 (provide 'egg-sim)
 
+;;; modified 2015.01.28 Mitsutoshi NAKANO <bkbin005@rinku.zaq.ne.jp>
+;;; ignore-errors in make-char
+;;; Please see:
+;;; http://sourceforge.jp/projects/tamago-tsunagi/lists/archive/misc/2015-January/000029.html
+;;; http://www.gnu.org/software/emacs/manual/html_node/elisp/Handling-Errors.html
 (defun make-char-list (charset &optional from to)
   (let ((result nil)
 	(chars (charset-chars charset))
@@ -56,8 +59,8 @@
 	 (<= to max)
 	 (cond ((= (charset-dimension charset) 1)
 		(while (<= from to)
-		  (setq result (cons (char-to-string
-				      (make-char charset to))
+		  (setq result (cons (ignore-errors (char-to-string
+						     (make-char charset to)))
 				     result)
 			to (1- to)))
 		result)
@@ -65,8 +68,9 @@
 		(while (<= from to)
 		  (let ((code max))
 		    (while (<= min code)
-		      (setq result (cons (char-to-string
-					  (make-char charset to code))
+		      (setq result (cons (ignore-errors
+					  (char-to-string
+					   (make-char charset to code)))
 					 result)
 			    code (1- code))))
 		  (setq to (1- to)))

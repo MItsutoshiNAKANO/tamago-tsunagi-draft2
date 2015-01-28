@@ -1,3 +1,8 @@
+2015-01-28  Mitsutoshi NAKANO  <bkbin005@rinku.zaq.ne.jp>
+
+	* .gitignore: ignored TAGS
+	* Makefile.in(clean): cleaned TAGS
+
 2014-12-15  Mitsutoshi NAKANO  <bkbin005@rinku.zaq.ne.jp>
 
 	* egg.el: egg-version: change version to "5.0.1.0"

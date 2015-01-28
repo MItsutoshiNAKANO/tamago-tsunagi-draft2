@@ -106,7 +106,7 @@ all: ${ELCS}
 	${EMACS} ${BATCHFLAGS} ${DEPS} -f batch-byte-compile $<
 
 clean: 
-	rm -f ${ELCS} *~ */*~ \#* .\#* */\#* */.\#*
+	rm -f ${ELCS} *~ */*~ \#* .\#* */\#* */.\#* TAGS
 
 distclean: 
 	rm -f ${ELCS} config.* Makefile 

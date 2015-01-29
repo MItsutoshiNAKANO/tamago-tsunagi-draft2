@@ -7,6 +7,7 @@
 	He wrote a patch, so applied.
 	* Makefile.in: added copyright ARAI Shun-ichi <hermes@ceres.dti.ne.jp>
 	* Makefile.in: deleted old Maintaner
+	* NEWS: fixed typo: forgot changing the number of problems
 
 2015-01-29  Mitsutoshi NAKANO  <bkbin005@rinku.zaq.ne.jp>
 

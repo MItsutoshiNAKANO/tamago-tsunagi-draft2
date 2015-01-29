@@ -1,10 +1,9 @@
 ;;; menudiag.el --- Minibuffer Menu System
 
-;; Copyright (C) 1999, 2000 Free Software Foundation, Inc
+;; Copyright (C) 1999, 2000, 2015 Free Software Foundation, Inc
+;;               2015 Hiroki Sato <hrs@allbsd.org>
 
 ;; Author: NIIBE Yutaka <gniibe@chroot.org>
-
-;; Maintainer: TOMURA Satoru <tomura@etl.go.jp>
 
 ;; Keywords: mule, multilingual, input method
 
@@ -226,6 +225,9 @@
   (remove-hook 'minibuffer-setup-hook 'menudiag-minibuffer-hook)
   (setq menudiag-minibuffer-list (cons (current-buffer)
 				       menudiag-minibuffer-list))
+  (if (boundp 'deactivate-input-method)
+    (deactivate-input-method)
+    (inactivate-input-method))
   (buffer-disable-undo)
   (menudiag-receive-variables)
   (menudiag-beginning-of-items)
@@ -248,7 +250,7 @@
 			       (string-width (cadr menu)))))
   (add-hook 'minibuffer-setup-hook 'menudiag-minibuffer-hook)
   (unwind-protect
-      (progn
+      (let ((overriding-local-map menudiag-mode-map))
 	(read-from-minibuffer "" "" menudiag-mode-map)
 	(menudiag-receive-variables))
     (setq menudiag-minibuffer-list (cdr menudiag-minibuffer-list))

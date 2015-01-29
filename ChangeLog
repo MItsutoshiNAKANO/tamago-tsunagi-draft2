@@ -1,11 +1,21 @@
 2015-01-29  Mitsutoshi NAKANO  <bkbin005@rinku.zaq.ne.jp>
 
-	* egg-sim.el(make-char-list):
+	* menudiag.el: fixed #34849 by Hiroki Sato <hrs@allbsd.org>
+	issue: when egg-toroku-region, can not select menu by numbers
+	https://sourceforge.jp/ticket/browse.php?group_id=9668&tid=34849
+	https://sourceforge.jp/projects/tamago-tsunagi/lists/archive/misc/2015-January/000037.html
+	patch:
+	https://sourceforge.jp/projects/tamago-tsunagi/lists/archive/misc/2015-January/000043.html
+	- added Hiroki Sato to copyright
+	* menudiag.el(menudiag-minibuffer-hook): added imput-method control
+	* menudiag.el(menudiag-select-internal): rebinded overriding-local-map
+	* menudiag.el: deleted Maintainer name
+	* egg-sim.el(make-char-list): rewrote ignore-errors in make char
 	ARAI Shun-ichi <hermes@ceres.dti.ne.jp> wrote better fix.
 	https://sourceforge.jp/projects/tamago-tsunagi/lists/archive/misc/2015-January/000036.html
 	So Mitsutoshi rewrote.
 	* egg-sim.el: added ARAI Shun-ichi <hermes@ceres.dti.ne.jp> to copyright
-	* NEWS(5.0.4.0): announced new sim.
+	* NEWS(5.0.4.0): announced new version
 	* egg.el(egg-version): up from 5.0.2.0 to 5.0.4.0
 	* egg.el: added Mitsutoshi to copyright
 

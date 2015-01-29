@@ -1,11 +1,21 @@
 NEWS about tamago-tsunagi
 =========================
 
-## 5.0.4.0 Mitsutoshi NAKANO <bkbin005@rinku.zaq.ne.jp> rewrote sim.
+## 5.0.4.0 fixed 2 problems
+
+### Now, sim skips void chars in charsets
+
 ARAI Shun-ichi <hermes@ceres.dti.ne.jp> suggested better fix.
 https://sourceforge.jp/projects/tamago-tsunagi/lists/archive/misc/2015-January/000036.html
-So Mitsutoshi wewrote sim.
-Now, the sim skips void chars in the charsets.
+So Mitsutoshi NAKANO <bkbin005@rinku.zaq.ne.jp> rewrote sim.
+
+### fixed #34849  'when egg-toroku-region, can not select menu by numbers'
+
+Reported by ARAI Shun-ichi <hermes@ceres.dti.ne.jp>.
+https://sourceforge.jp/ticket/browse.php?group_id=9668&tid=34849
+https://sourceforge.jp/projects/tamago-tsunagi/lists/archive/misc/2015-January/000037.html
+Fixed by Hiroki Sato <hrs@allbsd.org>.
+https://sourceforge.jp/projects/tamago-tsunagi/lists/archive/misc/2015-January/000043.html
 
 ## 5.0.2.0 Mitsutoshi NAKANO <bkbin005@rinku.zaq.ne.jp>
 

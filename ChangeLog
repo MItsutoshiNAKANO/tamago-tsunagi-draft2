@@ -1,3 +1,13 @@
+2015-01-30  Mitsutoshi NAKANO  <bkbin005@rinku.zaq.ne.jp>
+
+	* Makefile.in(install-site): applied #34850 (install can not reinstall)
+	ARAI Shun-ichi <hermes@ceres.dti.ne.jp> found that "make install"
+	can not delete egg directory.
+	https://sourceforge.jp/ticket/browse.php?group_id=9668&tid=34850
+	He wrote a patch, so applied.
+	* Makefile.in: added copyright ARAI Shun-ichi <hermes@ceres.dti.ne.jp>
+	* Makefile.in: deleted old Maintaner
+
 2015-01-29  Mitsutoshi NAKANO  <bkbin005@rinku.zaq.ne.jp>
 
 	* menudiag.el: fixed #34849 by Hiroki Sato <hrs@allbsd.org>

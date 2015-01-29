@@ -2,9 +2,9 @@
 
 # Copyright (C) 1999, 2000, 2015 Free Software Foundation, Inc
 #               2015 Mitsutoshi NAKANO <bkbin005@rinku.zaq.ne.jp>
+#               2015 ARAI Shun-ichi <hermes@ceres.dti.ne.jp>
 # Author: NIIBE Yutaka <gniibe@chroot.org>
 #         TOMURA Satoru <tomura@etl.go.jp>
-# old Maintaner: Satoru Tomura <tomura@etl.go.jp>
 
 .SUFFIXES:
 SHELL	= @SHELL@
@@ -120,7 +120,7 @@ install: install-site
 
 install-site: all
 	echo "Egg system will be installed in ${lispdir}/egg...."; \
-	if [ -d -p ${DESTDIR}${lispdir}/egg ]; then \
+	if [ -d ${DESTDIR}${lispdir}/egg ]; then \
 	  echo "Clean up the previsous installation...."; \
 	  rm -rf ${DESTDIR}${lispdir}/egg/*;  \
 	else \

@@ -17,6 +17,12 @@ https://sourceforge.jp/projects/tamago-tsunagi/lists/archive/misc/2015-January/0
 Fixed by Hiroki Sato <hrs@allbsd.org>.
 https://sourceforge.jp/projects/tamago-tsunagi/lists/archive/misc/2015-January/000043.html
 
+### fixed #34850, Now, when reinstall, "make install" cleans egg directory.
+
+Reported by ARAI Shun-ichi <hermes@ceres.dti.ne.jp>.
+Fixed by ARAI Shun-ichi <hermes@ceres.dti.ne.jp>.
+https://sourceforge.jp/ticket/browse.php?group_id=9668&tid=34850
+
 ## 5.0.2.0 Mitsutoshi NAKANO <bkbin005@rinku.zaq.ne.jp>
 
 HotFix: C-^ (egg-sim) does not work.  So amended quickly.

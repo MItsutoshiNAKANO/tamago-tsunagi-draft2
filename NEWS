@@ -1,6 +1,12 @@
 NEWS about tamago-tsunagi
 =========================
 
+## 5.0.4.0 Mitsutoshi NAKANO <bkbin005@rinku.zaq.ne.jp> rewrote sim.
+ARAI Shun-ichi <hermes@ceres.dti.ne.jp> suggested better fix.
+https://sourceforge.jp/projects/tamago-tsunagi/lists/archive/misc/2015-January/000036.html
+So Mitsutoshi wewrote sim.
+Now, the sim skips void chars in the charsets.
+
 ## 5.0.2.0 Mitsutoshi NAKANO <bkbin005@rinku.zaq.ne.jp>
 
 HotFix: C-^ (egg-sim) does not work.  So amended quickly.

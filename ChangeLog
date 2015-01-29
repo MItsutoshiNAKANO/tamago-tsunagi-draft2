@@ -1,3 +1,14 @@
+2015-01-29  Mitsutoshi NAKANO  <bkbin005@rinku.zaq.ne.jp>
+
+	* egg-sim.el(make-char-list):
+	ARAI Shun-ichi <hermes@ceres.dti.ne.jp> wrote better fix.
+	https://sourceforge.jp/projects/tamago-tsunagi/lists/archive/misc/2015-January/000036.html
+	So Mitsutoshi rewrote.
+	* egg-sim.el: added ARAI Shun-ichi <hermes@ceres.dti.ne.jp> to copyright
+	* NEWS(5.0.4.0): announced new sim.
+	* egg.el(egg-version): up from 5.0.2.0 to 5.0.4.0
+	* egg.el: added Mitsutoshi to copyright
+
 2015-01-28  Mitsutoshi NAKANO  <bkbin005@rinku.zaq.ne.jp>
 
 	* egg-sim.el(make-char-list): ignore-errors in make-char

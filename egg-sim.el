@@ -5,7 +5,7 @@
 ;; Licensed to the Free Software Foundation.
 ;; Copyright (C) 2000 TOMURA Satoru <tomura@etl.go.jp>
 ;;               2015 Mitsutoshi NAKANO <bkbin005@rinku.zaq.ne.jp>
-
+;;               2015 ARAI Shun-ichi <hermes@ceres.dti.ne.jp>
 ;; Author: TOMURA Satoru <tomura@etl.go.jp>
 
 ;; Keywords: mule, multilingual, input method
@@ -42,11 +42,15 @@
 
 (provide 'egg-sim)
 
-;;; modified 2015.01.28 Mitsutoshi NAKANO <bkbin005@rinku.zaq.ne.jp>
+;;;; modified 2015.01.28 Mitsutoshi NAKANO <bkbin005@rinku.zaq.ne.jp>
 ;;; ignore-errors in make-char
 ;;; Please see:
 ;;; http://sourceforge.jp/projects/tamago-tsunagi/lists/archive/misc/2015-January/000029.html
 ;;; http://www.gnu.org/software/emacs/manual/html_node/elisp/Handling-Errors.html
+;;;; modified 2015.01.29 Mitsutoshi NAKANO <bkbin005@rinku.zaq.ne.jp>
+;;; ARAI Shun-ichi <hermes@ceres.dti.ne.jp> wrote better fix.
+;;; https://sourceforge.jp/projects/tamago-tsunagi/lists/archive/misc/2015-January/000036.html
+;;; So Mitsutoshi rewrote.
 (defun make-char-list (charset &optional from to)
   (let ((result nil)
 	(chars (charset-chars charset))
@@ -59,20 +63,20 @@
 	 (<= to max)
 	 (cond ((= (charset-dimension charset) 1)
 		(while (<= from to)
-		  (setq result (cons (ignore-errors (char-to-string
-						     (make-char charset to)))
-				     result)
-			to (1- to)))
+		  (ignore-errors
+		    (setq result (cons (char-to-string (make-char charset to))
+				       result)))
+		  (setq to (1- to)))
 		result)
 	       ((= (charset-dimension charset) 2)
 		(while (<= from to)
 		  (let ((code max))
 		    (while (<= min code)
-		      (setq result (cons (ignore-errors
-					  (char-to-string
-					   (make-char charset to code)))
-					 result)
-			    code (1- code))))
+		      (ignore-errors
+			(setq result (cons (char-to-string
+					    (make-char charset to code))
+					   result)))
+		      (setq code (1- code))))
 		  (setq to (1- to)))
 		result)))))
 

@@ -4,3 +4,14 @@ Installation Instructions
 1) ./configure
 2) make
 3) make install (as root)
+
+4) Customize your Emacs to load egg/leim-list.el.
+
+Please see
+https://www.gnu.org/software/emacs/manual/html_node/elisp/Startup-Summary.html
+
+Or if you do not want to edit your system files,
+you can add to ~/.emacs as follows:
+
+(add-to-list 'load-path "/usr/local/share/emacs/site-lisp/egg")
+(load-file "/usr/local/share/emacs/site-lisp/egg/leim-list.el")

@@ -7,10 +7,11 @@
 	from /usr/local/share/emacs/site-lisp/egg/.
 	Autoconf-2.69 dedines @lispdir@ as ${datarootdir}/emacs/site-lisp, but
 	Makefile.in undefined datarootdir.
-	* configure: reconfigured.
-	* Makefile.in(distclean): added rm -rf autom4tc.cache/ .
+	* configure: reconfigured
+	* Makefile.in(distclean): added rm -rf autom4tc.cache/
 	* .gitignore: added /autom4te.cache.
 	And modified config.* to /config.*
+	* INSTALL: added that users need to customize Emacs to load leim-list
 
 2015-01-30  Mitsutoshi NAKANO  <bkbin005@rinku.zaq.ne.jp>
 

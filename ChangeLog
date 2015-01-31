@@ -1,3 +1,17 @@
+2015-01-31  Mitsutoshi NAKANO  <bkbin005@rinku.zaq.ne.jp>
+
+	* Makefile.in(datarootdir): defined @datarootdir@, fixed #34855
+	https://sourceforge.jp/ticket/browse.php?group_id=9668&tid=34855
+	When "autoreconf; ./configure; make install", the installation
+	directory changes to /emacs/site-lisp/egg/
+	from /usr/local/share/emacs/site-lisp/egg/.
+	Autoconf-2.69 dedines @lispdir@ as ${datarootdir}/emacs/site-lisp, but
+	Makefile.in undefined datarootdir.
+	* configure: reconfigured.
+	* Makefile.in(distclean): added rm -rf autom4tc.cache/ .
+	* .gitignore: added /autom4te.cache.
+	And modified config.* to /config.*
+
 2015-01-30  Mitsutoshi NAKANO  <bkbin005@rinku.zaq.ne.jp>
 
 	* Makefile.in(install-site): applied #34850 (install can not reinstall)

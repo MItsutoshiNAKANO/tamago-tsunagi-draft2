@@ -1,6 +1,7 @@
 *.elc
 Makefile
-config.cache
-config.log
-config.status
+/config.cache
+/config.log
+/config.status
+/autom4te.cache
 TAGS

@@ -250,7 +250,7 @@
 			       (string-width (cadr menu)))))
   (add-hook 'minibuffer-setup-hook 'menudiag-minibuffer-hook)
   (unwind-protect
-      (let ((overriding-local-map menudiag-mode-map))
+      (progn
 	(read-from-minibuffer "" "" menudiag-mode-map)
 	(menudiag-receive-variables))
     (setq menudiag-minibuffer-list (cdr menudiag-minibuffer-list))

@@ -12,6 +12,9 @@
 	* .gitignore: added /autom4te.cache.
 	And modified config.* to /config.*
 	* INSTALL: added that users need to customize Emacs to load leim-list
+	* menudiag.el(menudiag-select-internal): reverted to 2015-01-29.
+	Hiroki Sato <hrs@allbsd.org> said that it is not necessary.
+	https://sourceforge.jp/projects/tamago-tsunagi/lists/archive/misc/2015-January/000071.html
 
 2015-01-30  Mitsutoshi NAKANO  <bkbin005@rinku.zaq.ne.jp>
 

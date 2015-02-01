@@ -1,3 +1,9 @@
+2015-02-02  Mitsutoshi NAKANO  <bkbin005@rinku.zaq.ne.jp>
+
+	* COPYING: replased file for fixing FSF address.  #34859
+	https://www.gnu.org/licenses/gpl-2.0.txt
+	http://sourceforge.jp/ticket/browse.php?group_id=9668&tid=34859
+
 2015-02-01  Mitsutoshi NAKANO  <bkbin005@rinku.zaq.ne.jp>
 
 	* egg.el(egg-version): release tsunagi-5.0.5.0

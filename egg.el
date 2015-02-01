@@ -2,6 +2,7 @@
 
 ;; Copyright (C) 1999-2015 Free Software Foundation, Inc
 ;;               2014, 2015 Mitsutoshi NAKANO <bkbin005@rinku.zaq.ne.jp>
+;;               2015 Hiroki Sato <hrs@allbsd.org>
 
 ;; Author: NIIBE Yutaka <gniibe@chroot.org>
 ;;         KATAYAMA Yoshio <kate@pfu.co.jp>
@@ -183,8 +184,8 @@
 
 (defun egg-exit-from-minibuffer ()
   (if (boundp 'deactivate-input-method)
-      deactivate-input-method
-    inactivate-input-method)
+      (deactivate-input-method)
+    (inactivate-input-method))
   (if (<= (minibuffer-depth) 1)
       (remove-hook 'minibuffer-exit-hook 'egg-exit-from-minibuffer)))
 

@@ -1,10 +1,11 @@
 2015-02-01  Mitsutoshi NAKANO  <bkbin005@rinku.zaq.ne.jp>
 
-	* egg.el(egg-version) release tsunagi-5.0.5.0
+	* egg.el(egg-version): release tsunagi-5.0.5.0
 	* egg.el(egg-exit-from-minibuffer): applied patch from
 	Hiroki Sato <hrs@allbsd.org>.
 	He found a modified leak in tamago-tsunagi.
 	https://sourceforge.jp/projects/tamago-tsunagi/lists/archive/misc/2015-February/000085.html
+	* NEWS: added 5.0.5.0 for (egg-exit-from-minibuffer)
 
 2015-01-31  Mitsutoshi NAKANO  <bkbin005@rinku.zaq.ne.jp>
 

@@ -30,7 +30,7 @@
 
 ;;; Code:
 
-(defconst egg-version "5.0.4.0"
+(defconst egg-version "5.0.5.0"
   "Version number for this version of Tamago.")
 
 (defconst egg-tsunagi-version egg-version

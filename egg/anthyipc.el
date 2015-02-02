@@ -46,8 +46,7 @@
 	  ,@vlist)
      (if (and (eq (process-status proc) 'run)
 	      (buffer-live-p buffer))
-	 (save-excursion
-	   (set-buffer buffer)
+	 (with-current-buffer buffer
 	   (erase-buffer)
 	   ,send-expr
 	   (goto-char (point-max))

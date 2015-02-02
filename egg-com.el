@@ -598,8 +598,7 @@
     (set-buffer work)
     (erase-buffer)
     (if (null (stringp from))
-	(save-excursion
-	  (set-buffer buf)
+	(with-current-buffer buf
 	  (setq from (buffer-substring from to))))
     (insert (string-as-multibyte from))
     (encode-fixed-euc-china-region 1 (point-max) type)
@@ -989,8 +988,7 @@ See `comm-format' for FORMAT."
 	  ,@vlist)
      (if (and (memq (process-status proc) '(open run))
 	      (buffer-live-p buffer))
-	 (save-excursion
-	   (set-buffer buffer)
+	 (with-current-buffer buffer
 	   (let ,euc-select
 	     (erase-buffer)
 	     ,send-expr

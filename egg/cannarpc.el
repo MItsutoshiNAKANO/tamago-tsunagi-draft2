@@ -79,8 +79,7 @@
     (list
      'let v
      (append
-	`(save-excursion
-	   (set-buffer (process-buffer proc))
+	`(with-current-buffer (process-buffer proc)
 	   (erase-buffer)
 	   ,send-expr
 	   (process-send-region proc (point-min) (point-max))

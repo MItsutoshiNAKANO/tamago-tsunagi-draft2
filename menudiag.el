@@ -630,8 +630,7 @@
 (defun menudiag-selection-goto-internal ()
   (let* ((list menudiag-goto-number-list)
 	 (n (menudiag-selection-item-number list))
-	 (len (save-excursion
-		(set-buffer menudiag-selection-main-buffer)
+	 (len (with-current-buffer menudiag-selection-main-buffer
 		(length menudiag-current-items))))
     (setq this-command 'menudiag-selection-goto)
     (if (>= n len)

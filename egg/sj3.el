@@ -2,6 +2,7 @@
 ;;;                Input Method Architecture
 
 ;; Copyright (C) 1999, 2000 Free Software Foundation, Inc
+;;               2015 Hiroki Sato <hrs@allbsd.org>
 
 ;; Author: NIIBE Yutaka <gniibe@chroot.org>
 
@@ -147,8 +148,7 @@ Don't specify the optional arguments in normal use."
     (set-process-query-on-exit-flag proc nil)
     (set-process-coding-system proc 'binary 'binary)
     (set-marker-insertion-type (process-mark proc) t)
-    (save-excursion
-      (set-buffer buf)
+    (with-current-buffer buf
       (erase-buffer)
       (buffer-disable-undo)
       (set-buffer-multibyte nil))
@@ -175,8 +175,7 @@ Don't specify the optional arguments in normal use."
 ;;   (let* ((buf (generate-new-buffer " *SJ3*"))
 ;; 	 (msg-form "SJ3: connecting to sj3serv at %s...")
 ;; 	 hostname proc result msg)
-;;     (save-excursion
-;;       (set-buffer buf)
+;;     (with-current-buffer buf
 ;;       (erase-buffer)
 ;;       (buffer-disable-undo)
 ;;       (setq enable-multibyte-characters nil))

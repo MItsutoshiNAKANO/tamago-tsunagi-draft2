@@ -2,6 +2,7 @@
 ;;;                   Input Method Architecture
 
 ;; Copyright (C) 1999, 2000 Free Software Foundation, Inc
+;;               2015 Hiroki Sato <hrs@allbsd.org>
 
 ;; Author: NIIBE Yutaka <gniibe@chroot.org>
 ;;         KATAYAMA Yoshio <kate@pfu.co.jp> ; Korean, Chinese support.
@@ -1720,8 +1721,7 @@ HINSHI and FUZOKUGO are information of preceding bunsetsu."
 		  (insert contents)
 		  (if (= result 2)
 		      (insert-file-contents local-filename nil (1- (point))))
-		  (save-excursion
-		    (set-buffer (process-buffer proc))
+		  (with-current-buffer (process-buffer proc)
 		    (wnnrpc-get-result)))))))))
     ((quit error)
      (wnnrpc-call-with-environment env ()

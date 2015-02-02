@@ -2,6 +2,7 @@
 ;;;                Input Method Architecture
 
 ;; Copyright (C) 1999,2000 PFU LIMITED
+;;               2015 Hiroki Sato <hrs@allbsd.org>
 
 ;; Author: NIIBE Yutaka <gniibe@chroot.org>
 ;;         KATAYAMA Yoshio <kate@pfu.co.jp>
@@ -140,7 +141,7 @@ by ':' and digit N."
 (defun wnn-make-backend (lang env &optional source-lang converted-lang)
   (let ((finalize (wnn-backend-func-name "wnn-finalize-backend" lang))
 	(backend (wnn-backend-func-name "wnn-backend" lang env)))
-    (if (null (fboundp finalize))
+    (if (null (fboundp 'finalize))
 	(progn
 	  (fset finalize `(lambda () (wnn-finalize-backend ',lang)))
 	  (egg-set-finalize-backend (list finalize))))
@@ -1233,8 +1234,7 @@ Return the list of bunsetsu."
     (unwind-protect
 	(progn
 	  (setq buf (generate-new-buffer (wnn-server-buffer-name server-info)))
-	  (save-excursion
-	    (set-buffer buf)
+	  (with-current-buffer buf
 	    (erase-buffer)
 	    (buffer-disable-undo)
 	    (set-buffer-multibyte nil)

@@ -2,6 +2,7 @@
 ;;;                  Egg Input Method Architecture
 
 ;; Copyright (C) 1999, 2000 Free Software Foundation, Inc
+;;               2015 Hiroki Sato <hrs@allbsd.org>
 
 ;; Author: NIIBE Yutaka <gniibe@chroot.org>
 
@@ -132,7 +133,7 @@
 (defun canna-make-backend (lang env &optional source-lang converted-lang)
   (let ((finalize (canna-backend-func-name "canna-finalize-backend" lang))
 	(backend (canna-backend-func-name "canna-backend" lang env)))
-    (if (null (fboundp finalize))
+    (if (null (fboundp 'finalize))
 	(progn
 	  (fset finalize (function (lambda () (canna-finalize-backend))))
 	  (egg-set-finalize-backend (list finalize))))
@@ -317,8 +318,7 @@ katakana to candidates list. NOSTUDY specifies not study."
     (unwind-protect
 	(progn
 	  (setq buf (generate-new-buffer " *CANNA*"))
-    (save-excursion
-      (set-buffer buf)
+    (with-current-buffer buf
       (erase-buffer)
       (buffer-disable-undo)
 	    (set-buffer-multibyte nil)

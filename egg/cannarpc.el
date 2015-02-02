@@ -2,6 +2,7 @@
 ;;;                     Egg Input Method Architecture
 
 ;; Copyright (C) 1999, 2000 Free Software Foundation, Inc
+;;               2015 Hiroki Sato <hrs@allbsd.org>
 
 ;; Author: NIIBE Yutaka <gniibe@chroot.org>
 
@@ -77,8 +78,7 @@
     (list
      'let v
      (append
-	`(save-excursion
-	   (set-buffer (process-buffer proc))
+	`(with-current-buffer (process-buffer proc)
 	   (erase-buffer)
 	   ,send-expr
 	   (process-send-region proc (point-min) (point-max))

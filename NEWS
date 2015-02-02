@@ -1,6 +1,10 @@
 NEWS about tamago-tsunagi
 =========================
 
+## 5.0.7.0 imported FreeBSD's tamago-emacs24-4.0.6.0.20041122.19_12. (#34861)
+
+https://sourceforge.jp/ticket/browse.php?group_id=9668&tid=34861
+
 ## 5.0.6.0 fixed #34859 #34862 by Mitsutoshi NAKANO <bkbin005@rinku.zaq.ne.jp>
 
 ### fixed FSF address (#34859)

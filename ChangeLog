@@ -1,5 +1,42 @@
 2015-02-02  Mitsutoshi NAKANO  <bkbin005@rinku.zaq.ne.jp>
 
+	* egg.el(egg-version) updated 5.0.6.0 -> 5.0.7.0
+	* NEWS: added 5.0.7.0
+
+	*** imported FreeBSD's tamago-emacs24-4.0.6.0.20041122.19_12. (#34861)
+	Hiroki Sato <hrs@allbsd.org> updated FreeBSD' tamago.
+	So I imported it.
+
+	** used (with-current-buffer) instead of (save-excursion)
+	* egg-com.el(pre-write-encode-fixed-euc-china)
+	(comm-call-with-proc)
+	* egg.el(egg-activate-keymap-after-command)
+	* egg/anthy.el(anthy-egg-new-environment)
+	(anthy-egg-add-word)
+	* egg/anthyipc.el(anthyipc-call-with-proc)
+	* egg/canna.el(canna-open)
+	* egg/cannarpc.el(cannarpc-call-with-environment)
+	* egg/sj3.el(sj3-open)
+	* egg/sj3rpc.el(sj3rpc-call-with-environment)
+	* egg/wnn.el(wnn-open)
+	* egg/wnnrpc.el(wnnrpc-file-receive)
+	* menudiag.el(menudiag-selection-goto-internal)
+
+	* egg.el(egg-mode): used (fboundp) insted of (boundp)
+	(egg-exit-from-minibuffer): used (fboundp) insted of (boundp)
+
+	* egg/canna.el(canna-make-backend): quoted (fboundp)'s argument
+	* egg/wnn.el(wnn-make-backend): quoted (fboundp)'s argument
+
+	* egg/anthy.el: added copyright 2015 Hiroki Sato <hrs@allbsd.org>
+	* egg/anthyipc.el: added copyright 2015 Hiroki Sato <hrs@allbsd.org>
+	* egg/canna.el: added copyright 2015 Hiroki Sato <hrs@allbsd.org>
+	* egg/cannarpc.el: added copyright 2015 Hiroki Sato <hrs@allbsd.org>
+	* egg/sj3.el: added copyright 2015 Hiroki Sato <hrs@allbsd.org>
+	* egg/sj3rpc.el: added copyright 2015 Hiroki Sato <hrs@allbsd.org>
+	* egg/wnn.el: added copyright 2015 Hiroki Sato <hrs@allbsd.org>
+
+
 	* egg.el(egg-version): updated 5.0.5.0 -> 5.0.6.0
 	* COPYING *.el */*.el: fixed FSF address (#34859)
 	http://sourceforge.jp/ticket/browse.php?group_id=9668&tid=34859

@@ -2,6 +2,7 @@
 ;;;                Input Method Architecture
 
 ;; Copyright (C) 2002 The Free Software Initiative of Japan
+;;               2015 Hiroki Sato <hrs@allbsd.org>
 
 ;; Author: NIIBE Yutaka <gniibe@m17n.org>
 
@@ -43,8 +44,7 @@
 	  ,@vlist)
      (if (and (eq (process-status proc) 'run)
 	      (buffer-live-p buffer))
-	 (save-excursion
-	   (set-buffer buffer)
+	 (with-current-buffer buffer
 	   (erase-buffer)
 	   ,send-expr
 	   (goto-char (point-max))

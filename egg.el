@@ -30,7 +30,7 @@
 
 ;;; Code:
 
-(defconst egg-version "5.0.6.0"
+(defconst egg-version "5.0.7.0"
   "Version number for this version of Tamago.")
 
 (defconst egg-tsunagi-version egg-version
@@ -123,10 +123,10 @@
 
 (defun egg-activate-keymap-after-command ()
   (while egg-change-major-mode-buffer
-    (save-excursion
-      (when (buffer-live-p (car egg-change-major-mode-buffer))
-	(set-buffer (car egg-change-major-mode-buffer))
-	(egg-activate-keymap))
+    (let ((buf (car egg-change-major-mode-buffer)))
+      (if (buffer-live-p buf)
+          (with-current-buffer buf
+            (egg-activate-keymap)))
       (setq egg-change-major-mode-buffer (cdr egg-change-major-mode-buffer))))
   (remove-hook 'post-command-hook 'egg-activate-keymap-after-command))
 
@@ -170,7 +170,7 @@
 	  (setq egg-modefull-mode t)
 	  (its-define-select-keys egg-modefull-map))
       (setq egg-modeless-mode t))
-    (set (if (boundp 'deactivate-current-input-method-function)
+    (set (if (fboundp 'deactivate-current-input-method-function)
 	     'deactivate-current-input-method-function
 	   'inactivate-current-input-method-function)
 	 'egg-mode)
@@ -183,7 +183,7 @@
     (run-hooks 'egg-mode-hook)))
 
 (defun egg-exit-from-minibuffer ()
-  (if (boundp 'deactivate-input-method)
+  (if (fboundp 'deactivate-input-method)
       (deactivate-input-method)
     (inactivate-input-method))
   (if (<= (minibuffer-depth) 1)

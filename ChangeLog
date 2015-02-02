@@ -1,6 +1,9 @@
 2015-02-03  Mitsutoshi NAKANO  <bkbin005@rinku.zaq.ne.jp>
 
-	* egg.el(egg-version) updated 5.0.7.0 -> 5.0.7.1
+	* ChangeLog(2015-02-03): fixed typo
+	(2015-02-02): fixed typo
+
+	* egg.el(egg-version): updated 5.0.7.0 -> 5.0.7.1
 	* egg-anthy.readme: removed it (#34871)
 	https://sourceforge.jp/ticket/browse.php?group_id=9668&tid=34871
 	Hideyuki SHIRAI <shirai@meadowy.org> said that it is too old.
@@ -10,7 +13,7 @@
 
 2015-02-02  Mitsutoshi NAKANO  <bkbin005@rinku.zaq.ne.jp>
 
-	* egg.el(egg-version) updated 5.0.6.0 -> 5.0.7.0
+	* egg.el(egg-version): updated 5.0.6.0 -> 5.0.7.0
 	* NEWS: added 5.0.7.0
 
 	*** imported FreeBSD's tamago-emacs24-4.0.6.0.20041122.19_12. (#34861)

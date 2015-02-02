@@ -1,6 +1,20 @@
 NEWS about tamago-tsunagi
 =========================
 
+## 5.0.6.0 fixed #34859 #34862 by Mitsutoshi NAKANO <bkbin005@rinku.zaq.ne.jp>
+
+### fixed FSF address (#34859)
+
+http://sourceforge.jp/ticket/browse.php?group_id=9668&tid=34859
+
+### deleted Maintainer lines in sources (#34862)
+
+http://sourceforge.jp/ticket/browse.php?group_id=9668&tid=34862
+TOMURA Satoru said that he resigned as the maintainer.
+And I found that Mr. NIIBE and Mr. SHIIRAI are maintainers in sources.
+But tyey are not tamago-tsunagi's maintainers.
+So I deleted Maintainer lines in sources.
+
 ## 5.0.5.0 fixed (egg-exit-from-minibuffer) in egg.el
 
 ## 5.0.4.0 fixed 3 problems

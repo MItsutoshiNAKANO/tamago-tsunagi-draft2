@@ -1,8 +1,54 @@
 2015-02-02  Mitsutoshi NAKANO  <bkbin005@rinku.zaq.ne.jp>
 
-	* COPYING: replased file for fixing FSF address.  #34859
-	https://www.gnu.org/licenses/gpl-2.0.txt
+	* egg.el(egg-version): updated 5.0.5.0 -> 5.0.6.0
+	* COPYING *.el */*.el: fixed FSF address (#34859)
 	http://sourceforge.jp/ticket/browse.php?group_id=9668&tid=34859
+	* *.el: */*.el: deleted Maintainer lines in sources (#34862)
+	http://sourceforge.jp/ticket/browse.php?group_id=9668&tid=34862
+	TOMURA Satoru said that he resigned as the maintainer.
+	And I found that Mr. NIIBE and Mr. SHIIRAI are maintainers in sources.
+	But tyey are not tamago-tsunagi's maintainers.
+	So we need to delete Maintainer lines in sources.
+	* COPYING: replased to https://www.gnu.org/licenses/gpl-2.0.txt (#34859)
+	* its/jiskana.el: fixed #34859
+	* its.el: fixed #34859 #34862
+	* its/pinyin.el: fixed #34859 #34862
+	* its/zenkaku.el: fixed #34859 #34862
+	* its/quanjiao.el: fixed #34859 #34862
+	* egg/wnn.el: fixed #34859 #34862
+	* its/hangul.el: fixed #34859 #34862
+	* its/ascii.el: fixed #34859 #34862
+	* egg/sj3rpc.el: fixed #34859 #34862
+	* egg-edep.el: fixed #34859 #34862
+	* its/zhuyin.el: fixed #34859 #34862
+	* its/hira.el: fixed #34859 #34862
+	* egg/canna.el: fixed #34859 #34862
+	* its-keydef.el: fixed #34859 #34862 and deleted duplicating Keywords
+	line
+	* menudiag.el: fixed #34859
+	* its/bixing.el: fixed #34859 #34862
+	* eggrc: fixed #34859 #34862
+	* its/hankata.el: fixed #34859 #34862
+	* its/thai.el: fixed #34859 #34862
+	* egg.el: fixed #34859
+	* its/erpin.el: fixed #34859 #34862
+	* leim-list.el: fixed #34859 #34862
+	* its/aynu.el: fixed #34859 #34862
+	* egg/cannarpc.el: fixed #34859 #34862
+	* its/jeonkak.el: fixed #34859 #34862
+	* egg/sj3.el: fixed #34859 #34862
+	* docomp.el: fixed #34859 #34862
+	* egg-cnv.el: fixed #34859 #34862
+	* egg-com.el: fixed #34859 #34862
+	* egg-mlh.el: fixed #34859 #34862
+	* egg-sim.el: fixed #34859
+	* egg-x0213.el: fixed #34859 #34862
+	* egg/anthy.el: fixed #34859 #34862
+	* egg/anthyipc.el: fixed #34859 #34862
+	* egg/wnnrpc.el: fixed #34859 #34862
+	* its/kata.el: fixed #34859
+	* jisx0213.el: fixed #34859 #34862
+	* NEWS: added 5.0.6.0
 
 2015-02-01  Mitsutoshi NAKANO  <bkbin005@rinku.zaq.ne.jp>
 

@@ -1,6 +1,14 @@
 NEWS about tamago-tsunagi
 =========================
 
+## 5.0.7.1 removed egg-anthy.readme (#34871)
+
+https://sourceforge.jp/ticket/browse.php?group_id=9668&tid=34871
+Hideyuki SHIRAI <shirai@meadowy.org> said that it is too old.
+https://sourceforge.jp/projects/tamago-tsunagi/lists/archive/misc/2015-February/000109.html
+So removed it.
+If you want it, clone repository, and checkout old tamago-tsunagi.
+
 ## 5.0.7.0 imported FreeBSD's tamago-emacs24-4.0.6.0.20041122.19_12. (#34861)
 
 https://sourceforge.jp/ticket/browse.php?group_id=9668&tid=34861

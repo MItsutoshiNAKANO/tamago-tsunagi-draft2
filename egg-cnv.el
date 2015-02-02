@@ -1245,7 +1245,8 @@ mode, if non-NIL."
   (with-output-to-temp-buffer "*Help*"
     (princ "EGG Conversion mode:\n")
     (princ (documentation 'egg-conversion-mode))
-    (help-setup-xref (cons #'help-xref-mode (current-buffer)) (interactive-p))))
+    (help-setup-xref (cons #'help-xref-mode (current-buffer))
+      (called-interactively-p 'interactive))))
 
 (provide 'egg-cnv)
 

@@ -646,7 +646,7 @@ else
 fi
 
 
-lispdir=${datadir}/emacs/site-lisp
+: ${lispdir:=${datadir}/emacs/24.4/site-lisp}
 
 trap '' 1 2 15
 cat > confcache <<\EOF
